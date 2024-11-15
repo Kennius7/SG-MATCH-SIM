@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from 'react';
 
 function FootballPitchSimulation() {
@@ -17,6 +18,19 @@ function FootballPitchSimulation() {
             y: speed * Math.sin(angle),
         });
     };
+
+    
+    const startMatch = () => {
+        const beginPlayInterval = setInterval(() => {
+            kickBall();
+        }, 1000);
+        // beginPlayInterval()
+    }
+
+    const stopMatch = () => {
+        // clearInterval(beginPlayInterval);
+    }
+
 
   // Update ball position based on velocity with friction to slow it down
     useEffect(() => {
@@ -49,7 +63,7 @@ function FootballPitchSimulation() {
                 setTrail((prevTrail) => {
                     const newTrail = [...prevTrail, { top: newTop, left: newLeft }];
                     // Limit the length of the trail array to avoid excessive memory usage
-                    if (newTrail.length > 50) {
+                    if (newTrail.length > 250) {
                         newTrail.shift(); // Remove the oldest position
                     }
                     return newTrail;
@@ -77,7 +91,7 @@ function FootballPitchSimulation() {
 
 
     return (
-        <section className='pt-32 bg-red-200 h-dvh'>
+        <section className='pt-24 bg-red-200 h-dvh'>
             <div 
                 ref={pitchRef} 
                 className='relative w-[600px] h-[400px] mx-auto bg-[#006400] border-[2px] border-white 
@@ -95,10 +109,10 @@ function FootballPitchSimulation() {
                 <div id={"Goal Left"} className='absolute topCalc left-0 w-[20px] h-[80px] bg-white'></div>
                 <div id={"Goal Right"} className='absolute topCalc right-0 w-[20px] h-[80px] bg-white'></div>
 
-                <svg style={{ pointerEvents: 'none' }} className='absolute top-0 left-0 w-full h-full'>
+                <svg style={{ pointerEvents: 'none' }} className='absolute top-[10px] left-[5px] w-full h-full'>
                     <polyline 
                         fill="none"
-                        stroke="rgba(255, 255, 255, 0.8)" // Blue trail
+                        stroke="rgba(255, 255, 255, 0.8)"
                         strokeWidth="2"
                         points={trail.map((pos) => `${pos.left},${pos.top}`).join(' ')} 
                     />
@@ -109,6 +123,17 @@ function FootballPitchSimulation() {
                     style={{ top: `${ballPosition.top}px`, left: `${ballPosition.left}px` }}
                     onClick={kickBall}
                 ></div>
+            </div>
+
+            <div className='w-full flex justify-center items-center mt-6'>
+                <button onClick={startMatch} className='rounded-[25px] bg-green-500 text-gray-800 px-6 py-2 
+                    border-[2px] border-white/60 mr-2'>
+                    Start Match
+                </button>
+                <button onClick={stopMatch} className='rounded-[25px] bg-red-500 text-gray-800 px-6 py-2 
+                    border-[2px] border-white/60 ml-2'>
+                    Stop Match
+                </button>
             </div>
         </section>
     );
