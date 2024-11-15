@@ -1,5 +1,8 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from 'react';
+import Ball from "../assets/img/soccer-ball.png";
+
+
 
 function FootballPitchSimulation() {
     const [ballPosition, setBallPosition] = useState({ top: 50, left: 50 });
@@ -7,6 +10,7 @@ function FootballPitchSimulation() {
     const pitchRef = useRef(null);
     const animationRef = useRef(null);
     const [trail, setTrail] = useState([]); // Store the ball's past positions
+    const [isStart, setIsStart] = useState(false);
 
   // Function to "kick" the ball in a random direction with a random speed
     const kickBall = () => {
@@ -21,6 +25,7 @@ function FootballPitchSimulation() {
 
     
     const startMatch = () => {
+        setIsStart(true);
         const beginPlayInterval = setInterval(() => {
             kickBall();
         }, 1000);
@@ -89,10 +94,10 @@ function FootballPitchSimulation() {
     }, [velocity]);
 
 
-
     return (
         <section className='pt-24 bg-red-200 h-dvh'>
             <div 
+                id={"Football Pitch"}
                 ref={pitchRef} 
                 className='relative w-[600px] h-[400px] mx-auto bg-[#006400] border-[2px] border-white 
                 rounded-[5px] overflow-hidden'
@@ -106,10 +111,15 @@ function FootballPitchSimulation() {
                     id={"Center Line"} 
                     className='absolute top-0 left-[50%] w-[1px] h-full bg-white border-[0.5px] border-white'>
                 </div>
-                <div id={"Goal Left"} className='absolute topCalc left-0 w-[20px] h-[80px] bg-white'></div>
-                <div id={"Goal Right"} className='absolute topCalc right-0 w-[20px] h-[80px] bg-white'></div>
+                <div id={"Goal Left"} className='absolute topCalc1 left-0 w-[20px] h-[80px] bg-white'></div>
+                <div id={"Goal Right"} className='absolute topCalc1 right-0 w-[20px] h-[80px] bg-white'></div>
+                <div id={"18 Yard Left"} className='absolute topCalc2 left-0 w-[50px] h-[120px] bg-transparent border-[1px] border-white'></div>
+                <div id={"18 Yard Right"} className='absolute topCalc2 right-0 w-[50px] h-[120px] bg-transparent border-[1px] border-white'></div>
 
-                <svg style={{ pointerEvents: 'none' }} className='absolute top-[10px] left-[5px] w-full h-full'>
+                <svg 
+                    style={{ pointerEvents: 'none' }} 
+                    className='absolute top-[10px] left-[8px] w-full h-full'
+                >
                     <polyline 
                         fill="none"
                         stroke="rgba(255, 255, 255, 0.8)"
@@ -119,10 +129,11 @@ function FootballPitchSimulation() {
                 </svg>
 
                 <div id={"Soccer Ball"}
-                    className='ball'
+                    className={`ball absolute w-[15px] h-[15px] bg-white rounded-full cursor-pointer 
+                    ${isStart ? "animate-spin" : "animate-none"}`}
                     style={{ top: `${ballPosition.top}px`, left: `${ballPosition.left}px` }}
                     onClick={kickBall}
-                ></div>
+                ><img src={Ball} alt='Ball' className='w-full h-full' /></div>
             </div>
 
             <div className='w-full flex justify-center items-center mt-6'>
