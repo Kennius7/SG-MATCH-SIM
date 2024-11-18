@@ -123,25 +123,25 @@ function FootballPitchSimulation() {
                 className={`relative w-[${footballPitchWidth}px] h-[${footballPitchHeight}px] 
                 mx-auto sm:mx-0 mb-8 bg-[#006400] border-[2px] border-white rounded-[5px] overflow-hidden`}
             >
-                {/* Center Circle */}
+                {/* Center Circle
                 <div 
                     className='absolute top-[50%] left-[50%] w-[60px] h-[60px] -mt-[30px] -ml-[30px] 
                     border-[2px] border-white rounded-[999px]'>
                 </div>
                 {/* Center Line */}
-                <div 
+                {/* <div 
                     className='absolute top-[50%] left-0 w-full h-[1px] bg-white border-[0.5px] border-white'>
-                </div>
+                </div> */}
                 {/* Goal Box Top */}
-                <div className='absolute leftCalc1 top-0 w-[80px] h-[20px] bg-white'></div>
+                {/* <div className='absolute leftCalc1 top-0 w-[80px] h-[20px] bg-white'></div> */}
                 {/* Goal Box Bottom */}
-                <div className='absolute leftCalc1 bottom-0 w-[80px] h-[20px] bg-white'></div>
+                {/* <div className='absolute leftCalc1 bottom-0 w-[80px] h-[20px] bg-white'></div> */}
                 {/* 18 Yard Box Top */}
-                <div className='absolute leftCalc2 top-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div>
+                {/* <div className='absolute leftCalc2 top-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div> */}
                 {/* 18 Yard Box Bottom */}
-                <div className='absolute leftCalc2 bottom-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div>
+                {/* <div className='absolute leftCalc2 bottom-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div> */}
 
-                {/* <svg 
+                <svg 
                     style={{ pointerEvents: 'none' }} 
                     className='absolute top-[10px] left-[8px] w-full h-full'
                 >
@@ -151,7 +151,7 @@ function FootballPitchSimulation() {
                         strokeWidth="2"
                         points={trail.map((pos) => `${pos.left},${pos.top}`).join(' ')} 
                     />
-                </svg> */}
+                </svg>
 
                 {/* Soccer ball */}
                 <div 
