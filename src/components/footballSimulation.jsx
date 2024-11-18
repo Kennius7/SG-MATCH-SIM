@@ -15,7 +15,7 @@ function FootballPitchSimulation() {
     const animationRef = useRef(null);
     const [trail, setTrail] = useState([]); // Store the ball's past positions
     const [isStart, setIsStart] = useState(false);
-    const [playerTurn, setPlayerTurn] = useState(true);
+    const [playerTurn, setPlayerTurn] = useState(false);
 
 
 
@@ -48,7 +48,7 @@ function FootballPitchSimulation() {
     }
 
     const switchTurn = () => {
-        // setPlayerTurn(!playerTurn);
+        setPlayerTurn(!playerTurn);
     }
 
 
@@ -135,9 +135,9 @@ function FootballPitchSimulation() {
                     className='absolute top-[50%] left-0 w-full h-[1px] bg-white border-[0.5px] border-white'>
                 </div>
                 {/* Goal Box Top */}
-                <div className='absolute leftCalc1 top-0 w-[80px] h-[20px] bg-white'></div>
+                <div className={`absolute leftCalc1 top-0 w-[80px] h-[20px] ${playerTurn ? "bg-[#a6f1af]" : "bg-white"}`}></div>
                 {/* Goal Box Bottom */}
-                <div className='absolute leftCalc1 bottom-0 w-[80px] h-[20px] bg-white'></div>
+                <div className={`absolute leftCalc1 bottom-0 w-[80px] h-[20px] ${!playerTurn ? "bg-[#a6f1af]" : "bg-white"}`}></div>
                 {/* 18 Yard Box Top */}
                 <div className='absolute leftCalc2 top-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div>
                 {/* 18 Yard Box Bottom */}
