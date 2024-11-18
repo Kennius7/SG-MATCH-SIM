@@ -14,3 +14,12 @@
     top: calc(50% - 60px);
 }
 
+.leftCalc1 {
+    left: calc(50% - 40px);
+}
+
+.leftCalc2 {
+    left: calc(50% - 60px);
+}
+
+

@@ -5,22 +5,31 @@ import Ball from "../assets/img/soccer-ball.png";
 
 
 function FootballPitchSimulation() {
-    const [ballPosition, setBallPosition] = useState({ top: 50, left: 50 });
+    const footballPitchWidth = 320;
+    const footballPitchHeight = 550;
+    const [ballPosition, setBallPosition] = useState({ top: (footballPitchHeight / 2) - 8, left: (footballPitchWidth / 2) - 10 });
     const [velocity, setVelocity] = useState({ x: 0, y: 0 });
     const pitchRef = useRef(null);
     const animationRef = useRef(null);
     const [trail, setTrail] = useState([]); // Store the ball's past positions
     const [isStart, setIsStart] = useState(false);
+    const [playerTurn, setPlayerTurn] = useState(true);
 
-  // Function to "kick" the ball in a random direction with a random speed
+
+
+    // Function to "kick" the ball in a random direction with a random speed
     const kickBall = () => {
-        const speed = Math.random() * 4 + 1; // Random speed between 1 and 5
+        // const speed = Math.random() * 4 + 1; // Random speed between 1 and 5
+        const speed = 3;
         const angle = Math.random() * 2 * Math.PI; // Random angle in radians
 
         setVelocity({
             x: speed * Math.cos(angle),
             y: speed * Math.sin(angle),
         });
+
+        // console.log("The ball positions:", ballPosition);
+        // console.log("The ball's past positions:", trail);
     };
 
     
@@ -36,6 +45,10 @@ function FootballPitchSimulation() {
         // clearInterval(beginPlayInterval);
     }
 
+    const switchTurn = () => {
+        setPlayerTurn(!playerTurn);
+    }
+
 
   // Update ball position based on velocity with friction to slow it down
     useEffect(() => {
@@ -43,6 +56,7 @@ function FootballPitchSimulation() {
             setBallPosition((pos) => {
                 const newTop = pos.top + velocity.y;
                 const newLeft = pos.left + velocity.x;
+                // console.log("New Top and Left:", newTop, newLeft);
 
                 // Boundary collision to prevent the ball from leaving the pitch
                 const pitchWidth = pitchRef.current.offsetWidth;
@@ -58,6 +72,12 @@ function FootballPitchSimulation() {
                 if (newLeft < 0 || newLeft > pitchWidth - 15) {
                     updatedX = -updatedX; // Reverse direction on X axis
                 }
+                if (playerTurn && newTop > (pitchHeight / 2) - 15) {
+                    updatedY = -updatedY;
+                }
+                if (!playerTurn && newTop < (pitchHeight / 2) - 15) {
+                    updatedY = -updatedY;
+                }
 
                 setVelocity({
                     x: updatedX * 0.98, // Apply friction
@@ -68,7 +88,7 @@ function FootballPitchSimulation() {
                 setTrail((prevTrail) => {
                     const newTrail = [...prevTrail, { top: newTop, left: newLeft }];
                     // Limit the length of the trail array to avoid excessive memory usage
-                    if (newTrail.length > 250) {
+                    if (newTrail.length > 1000) {
                         newTrail.shift(); // Remove the oldest position
                     }
                     return newTrail;
@@ -91,16 +111,16 @@ function FootballPitchSimulation() {
 
         // Cleanup animation on component unmount
         return () => cancelAnimationFrame(animationRef.current);
-    }, [velocity]);
+    }, [velocity, playerTurn]);
 
 
     return (
-        <section className='pt-24 bg-red-200 h-dvh'>
+        <section className='pt-10 bg-black h-dvh'>
             <div 
                 id={"Football Pitch"}
                 ref={pitchRef} 
-                className='relative w-[600px] h-[400px] mx-auto bg-[#006400] border-[2px] border-white 
-                rounded-[5px] overflow-hidden'
+                className={`relative w-[${footballPitchWidth}px] h-[${footballPitchHeight}px] 
+                mx-auto bg-[#006400] border-[2px] border-white rounded-[5px] overflow-hidden`}
             >
                 <div 
                     id={"Center Circle"} 
@@ -109,12 +129,12 @@ function FootballPitchSimulation() {
                 </div>
                 <div 
                     id={"Center Line"} 
-                    className='absolute top-0 left-[50%] w-[1px] h-full bg-white border-[0.5px] border-white'>
+                    className='absolute top-[50%] left-0 w-full h-[1px] bg-white border-[0.5px] border-white'>
                 </div>
-                <div id={"Goal Left"} className='absolute topCalc1 left-0 w-[20px] h-[80px] bg-white'></div>
-                <div id={"Goal Right"} className='absolute topCalc1 right-0 w-[20px] h-[80px] bg-white'></div>
-                <div id={"18 Yard Left"} className='absolute topCalc2 left-0 w-[50px] h-[120px] bg-transparent border-[1px] border-white'></div>
-                <div id={"18 Yard Right"} className='absolute topCalc2 right-0 w-[50px] h-[120px] bg-transparent border-[1px] border-white'></div>
+                <div id={"Goal Top"} className='absolute leftCalc1 top-0 w-[80px] h-[20px] bg-white'></div>
+                <div id={"Goal Bottom"} className='absolute leftCalc1 bottom-0 w-[80px] h-[20px] bg-white'></div>
+                <div id={"18 Yard Left"} className='absolute leftCalc2 top-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div>
+                <div id={"18 Yard Right"} className='absolute leftCalc2 bottom-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div>
 
                 <svg 
                     style={{ pointerEvents: 'none' }} 
@@ -136,14 +156,20 @@ function FootballPitchSimulation() {
                 ><img src={Ball} alt='Ball' className='w-full h-full' /></div>
             </div>
 
-            <div className='w-full flex justify-center items-center mt-6'>
+            <div className='w-full flex justify-center items-center mt-2'>
                 <button onClick={startMatch} className='rounded-[25px] bg-green-500 text-gray-800 px-6 py-2 
-                    border-[2px] border-white/60 mr-2'>
+                    border-[2px] border-white/60 mr-2 text-[12px]'>
                     Start Match
                 </button>
                 <button onClick={stopMatch} className='rounded-[25px] bg-red-500 text-gray-800 px-6 py-2 
-                    border-[2px] border-white/60 ml-2'>
+                    border-[2px] border-white/60 ml-2 text-[12px]'>
                     Stop Match
+                </button>
+            </div>
+            <div className='w-full flex justify-center items-center mt-2'>
+                <button onClick={switchTurn} className='rounded-[25px] bg-yellow-800 text-gray-800 px-6 py-2 
+                    border-[2px] border-white/60 ml-2 text-[11px]'>
+                    Switch Player Turn
                 </button>
             </div>
         </section>
