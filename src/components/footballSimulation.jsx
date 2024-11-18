@@ -141,7 +141,7 @@ function FootballPitchSimulation() {
                 {/* 18 Yard Box Bottom */}
                 <div className='absolute leftCalc2 bottom-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div>
 
-                <svg 
+                {/* <svg 
                     style={{ pointerEvents: 'none' }} 
                     className='absolute top-[10px] left-[8px] w-full h-full'
                 >
@@ -151,7 +151,7 @@ function FootballPitchSimulation() {
                         strokeWidth="2"
                         points={trail.map((pos) => `${pos.left},${pos.top}`).join(' ')} 
                     />
-                </svg>
+                </svg> */}
 
                 {/* Soccer ball */}
                 <div 
