@@ -115,7 +115,7 @@ function FootballPitchSimulation() {
 
 
     return (
-        <section className='pt-10 bg-black h-dvh flex sm:flex-row flex-col sm:justify-center justify-center 
+        <section className='pt-10 bg-[#e9e7e0] h-dvh flex sm:flex-row flex-col sm:justify-center justify-center 
             items-center'>
             {/* Football Pitch */}
             <div 
