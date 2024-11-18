@@ -121,7 +121,7 @@ function FootballPitchSimulation() {
             <div 
                 ref={pitchRef} 
                 className={`relative w-[${footballPitchWidth}px] h-[${footballPitchHeight}px] 
-                mx-auto sm:mx-0 mb-8 my-auto bg-[#006400] border-[2px] border-white rounded-[5px] overflow-hidden`}
+                mx-auto sm:mx-0 mb-8 bg-[#006400] border-[2px] border-white rounded-[5px] overflow-hidden`}
             >
                 {/* Center Circle */}
                 <div 
