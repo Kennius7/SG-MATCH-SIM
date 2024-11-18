@@ -117,25 +117,29 @@ function FootballPitchSimulation() {
     return (
         <section className='pt-10 bg-black h-dvh flex sm:flex-row flex-col sm:justify-center justify-center 
             items-center'>
+            {/* Football Pitch */}
             <div 
-                id={"Football Pitch"}
                 ref={pitchRef} 
                 className={`relative w-[${footballPitchWidth}px] h-[${footballPitchHeight}px] 
                 mx-auto sm:mx-0 mb-8 my-auto bg-[#006400] border-[2px] border-white rounded-[5px] overflow-hidden`}
             >
+                {/* Center Circle */}
                 <div 
-                    id={"Center Circle"} 
                     className='absolute top-[50%] left-[50%] w-[60px] h-[60px] -mt-[30px] -ml-[30px] 
                     border-[2px] border-white rounded-[999px]'>
                 </div>
+                {/* Center Line */}
                 <div 
-                    id={"Center Line"} 
                     className='absolute top-[50%] left-0 w-full h-[1px] bg-white border-[0.5px] border-white'>
                 </div>
-                <div id={"Goal Top"} className='absolute leftCalc1 top-0 w-[80px] h-[20px] bg-white'></div>
-                <div id={"Goal Bottom"} className='absolute leftCalc1 bottom-0 w-[80px] h-[20px] bg-white'></div>
-                <div id={"18 Yard Left"} className='absolute leftCalc2 top-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div>
-                <div id={"18 Yard Right"} className='absolute leftCalc2 bottom-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div>
+                {/* Goal Box Top */}
+                <div className='absolute leftCalc1 top-0 w-[80px] h-[20px] bg-white'></div>
+                {/* Goal Box Bottom */}
+                <div className='absolute leftCalc1 bottom-0 w-[80px] h-[20px] bg-white'></div>
+                {/* 18 Yard Box Top */}
+                <div className='absolute leftCalc2 top-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div>
+                {/* 18 Yard Box Bottom */}
+                <div className='absolute leftCalc2 bottom-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div>
 
                 <svg 
                     style={{ pointerEvents: 'none' }} 
@@ -149,7 +153,8 @@ function FootballPitchSimulation() {
                     />
                 </svg>
 
-                <div id={"Soccer Ball"}
+                {/* Soccer ball */}
+                <div 
                     className={`ball absolute w-[15px] h-[15px] bg-white rounded-full cursor-pointer 
                     ${isStart ? "animate-spin" : "animate-none"}`}
                     style={{ top: `${ballPosition.top}px`, left: `${ballPosition.left}px` }}
@@ -157,6 +162,7 @@ function FootballPitchSimulation() {
                 ><img src={Ball} alt='Ball' className='w-full h-full' /></div>
             </div>
 
+            {/* Button controls */}
             <div className='sm:w-[200px] w-[250px] flex flex-col justify-center items-center my-2'>
                 <button onClick={startMatch} className='rounded-[25px] bg-green-500 text-gray-800 w-[80%] h-[40px] 
                     border-[2px] border-white/60 text-[14px] font-semibold'>
