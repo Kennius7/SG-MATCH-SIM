@@ -72,12 +72,12 @@ function FootballPitchSimulation() {
                 if (newLeft < 0 || newLeft > pitchWidth - 15) {
                     updatedX = -updatedX; // Reverse direction on X axis
                 }
-                if (playerTurn && newTop > (pitchHeight / 2) - 15) {
-                    updatedY = -updatedY;
-                }
-                if (!playerTurn && newTop < (pitchHeight / 2) - 15) {
-                    updatedY = -updatedY;
-                }
+                // if (playerTurn && newTop > (pitchHeight / 2) - 15) {
+                //     updatedY = -updatedY;
+                // }
+                // if (!playerTurn && newTop < (pitchHeight / 2) - 15) {
+                //     updatedY = -updatedY;
+                // }
 
                 setVelocity({
                     x: updatedX * 0.98, // Apply friction
@@ -115,12 +115,13 @@ function FootballPitchSimulation() {
 
 
     return (
-        <section className='pt-10 bg-black h-dvh'>
+        <section className='pt-10 bg-black h-dvh flex sm:flex-row flex-col sm:justify-center justify-center 
+            items-center'>
             <div 
                 id={"Football Pitch"}
                 ref={pitchRef} 
                 className={`relative w-[${footballPitchWidth}px] h-[${footballPitchHeight}px] 
-                mx-auto bg-[#006400] border-[2px] border-white rounded-[5px] overflow-hidden`}
+                mx-auto sm:mx-0 mb-8 my-auto bg-[#006400] border-[2px] border-white rounded-[5px] overflow-hidden`}
             >
                 <div 
                     id={"Center Circle"} 
@@ -156,19 +157,17 @@ function FootballPitchSimulation() {
                 ><img src={Ball} alt='Ball' className='w-full h-full' /></div>
             </div>
 
-            <div className='w-full flex justify-center items-center mt-2'>
-                <button onClick={startMatch} className='rounded-[25px] bg-green-500 text-gray-800 px-6 py-2 
-                    border-[2px] border-white/60 mr-2 text-[12px]'>
+            <div className='sm:w-[200px] w-[250px] flex flex-col justify-center items-center my-2'>
+                <button onClick={startMatch} className='rounded-[25px] bg-green-500 text-gray-800 w-[80%] h-[40px] 
+                    border-[2px] border-white/60 text-[14px] font-semibold'>
                     Start Match
                 </button>
-                <button onClick={stopMatch} className='rounded-[25px] bg-red-500 text-gray-800 px-6 py-2 
-                    border-[2px] border-white/60 ml-2 text-[12px]'>
+                <button onClick={stopMatch} className='rounded-[25px] bg-red-500 text-gray-800 w-[80%] h-[40px] 
+                    border-[2px] border-white/60 text-[14px] my-2 font-semibold'>
                     Stop Match
                 </button>
-            </div>
-            <div className='w-full flex justify-center items-center mt-2'>
-                <button onClick={switchTurn} className='rounded-[25px] bg-yellow-800 text-gray-800 px-6 py-2 
-                    border-[2px] border-white/60 ml-2 text-[11px]'>
+                <button onClick={switchTurn} className='rounded-[25px] bg-yellow-800 text-gray-800 w-[80%] h-[40px] 
+                    border-[2px] border-white/60 text-[13px] font-semibold'>
                     Switch Player Turn
                 </button>
             </div>
