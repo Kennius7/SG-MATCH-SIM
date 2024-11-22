@@ -1,27 +1,73 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from 'react';
 import Ball from "../assets/img/soccer-ball.png";
-
+import ballSound from "../assets/sound/ballkick1.mp3";
+import useSoundEffect from "../hooks/useSoundEffect";
 
 
 function FootballPitchSimulation() {
     const footballPitchWidth = 320;
     const footballPitchHeight = 550;
-    const footballPitchWidthCSS = "w-[" + 320 + "px]";
-    const footballPitchHeightCSS = "w-[" + 550 + "px]";
-    const [ballPosition, setBallPosition] = useState({ top: (footballPitchHeight / 2) - 8, left: (footballPitchWidth / 2) - 10 });
+    // const footballPitchWidthCSS = "w-[" + 320 + "px]";
+    // const footballPitchHeightCSS = "w-[" + 550 + "px]";
+    const LCMF_Ref = useRef(null);
+    const RCMF_Ref = useRef(null);
+    const soundRef = useRef(null);
+    const [ballPosition, setBallPosition] = useState({ top: (footballPitchHeight / 2) - 10, left: (footballPitchWidth / 2) - 10 });
     const [velocity, setVelocity] = useState({ x: 0, y: 0 });
     const pitchRef = useRef(null);
     const animationRef = useRef(null);
     const [trail, setTrail] = useState([]); // Store the ball's past positions
     const [isStart, setIsStart] = useState(false);
     const [playerTurn, setPlayerTurn] = useState(false);
+    const leftValue = 14;
+    const [playCount, setPlayCount] = useState(0);
+
+    useEffect(() => {
+        const calcPosition = () => {
+            if (LCMF_Ref.current) {
+                const playerPosLeft = LCMF_Ref.current.offsetLeft + 14;
+                const playerPosTop = LCMF_Ref.current.offsetTop - 5;
+                // const fieldDimensions = pitchRef.current.getBoundingClientRect();
+                // const relativeX = playerPos.left - fieldDimensions.left;
+                // const relativeY = playerPos.top - fieldDimensions.top;
+                // console.log("Player Left: ", playerPos.left, "Player Top: ", playerPos.top, "Field Left: ", fieldDimensions.left, "Field Top: ", fieldDimensions.top,);
+                // console.log("Player Left: ", playerPosLeft, "Player Top: ", playerPosTop);
+
+                setBallPosition({
+                    top: playerPosTop,
+                    left: playerPosLeft,
+                })
+            }
+        }
+
+        const timeoutID = setTimeout(() => {
+            calcPosition();
+        }, 0);
+
+        return () => clearTimeout(timeoutID);
+    }, [])
+
+    useEffect(() => {
+        soundRef.current = new Audio(ballSound);
+        soundRef.current.load();
+    }, [])
+    
+
+    // console.log("Positions: ", ballPosition);
+    // const sound = useRef(new Audio(ballSound));
+
+    const playBallSound = () => {
+        if (soundRef.current) {
+            soundRef.current.play();
+        }
+    }
 
 
-
-    // Function to "kick" the ball in a random direction with a random speed
     const kickBall = () => {
         // const speed = Math.random() * 4 + 1; // Random speed between 1 and 5
+        setPlayCount(prev => prev + 1);
+        playBallSound();
         const speed = 3;
         const angle = Math.random() * 2 * Math.PI; // Random angle in radians
 
@@ -34,14 +80,14 @@ function FootballPitchSimulation() {
         // console.log("The ball's past positions:", trail);
     };
 
-    
-    const startMatch = () => {
-        setIsStart(true);
-        const beginPlayInterval = setInterval(() => {
-            kickBall();
-        }, 1000);
-        // beginPlayInterval()
-    }
+
+    // const startMatch = () => {
+    //     setIsStart(true);
+    //     const beginPlayInterval = setInterval(() => {
+    //         kickBall();
+    //     }, 1000);
+    //     // beginPlayInterval()
+    // }
 
     const stopMatch = () => {
         // clearInterval(beginPlayInterval);
@@ -90,7 +136,7 @@ function FootballPitchSimulation() {
                 setTrail((prevTrail) => {
                     const newTrail = [...prevTrail, { top: newTop, left: newLeft }];
                     // Limit the length of the trail array to avoid excessive memory usage
-                    if (newTrail.length > 1000) {
+                    if (newTrail.length > 500) {
                         newTrail.shift(); // Remove the oldest position
                     }
                     return newTrail;
@@ -160,13 +206,91 @@ function FootballPitchSimulation() {
                     className={`ball absolute w-[15px] h-[15px] bg-white rounded-full cursor-pointer 
                     ${isStart ? "animate-spin" : "animate-none"}`}
                     style={{ top: `${ballPosition.top}px`, left: `${ballPosition.left}px` }}
-                    onClick={kickBall}
-                ><img src={Ball} alt='Ball' className='w-full h-full' /></div>
+                >
+                    <img src={Ball} alt='Ball' className='w-full h-full' />
+                </div>
+
+                {/* Players */}
+                <div className={`absolute top-0 left-0 w-[320px] h-[550px] bg-transparent`}>
+                    {/* Home Players */}
+                    <div style={{ left: `calc(50% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[20px]">H</div>
+                    <div style={{ left: `calc(20% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[84px]">H</div>
+                    <div style={{ left: `calc(40% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[84px]">H</div>
+                    <div style={{ left: `calc(60% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[84px]">H</div>
+                    <div style={{ left: `calc(80% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[84px]">H</div>
+                    
+                    <div style={{ left: `calc(20% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[250px]">H</div>
+                    <div ref={LCMF_Ref} style={{ left: `calc(40% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[250px]">H</div>
+                    <div ref={RCMF_Ref} style={{ left: `calc(60% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[250px]">H</div>
+                    <div style={{ left: `calc(80% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[250px]">H</div>
+
+                    <div style={{ left: `calc(40% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[420px]">H</div>
+                    <div style={{ left: `calc(60% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[420px]">H</div>
+
+                    {/* Away Players */}
+                    <div style={{ left: `calc(40% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-red-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[115px]">A</div>
+                    <div style={{ left: `calc(60% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-red-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[115px]">A</div>
+
+                    <div style={{ left: `calc(20% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-red-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[280px]">A</div>
+                    <div style={{ left: `calc(40% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-red-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[280px]">A</div>
+                    <div style={{ left: `calc(60% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-red-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[280px]">A</div>
+                    <div style={{ left: `calc(80% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-red-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[280px]">A</div>
+
+                    <div style={{ left: `calc(20% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-red-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[450px]">A</div>
+                    <div style={{ left: `calc(40% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-red-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[450px]">A</div>
+                    <div style={{ left: `calc(60% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-red-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[450px]">A</div>
+                    <div style={{ left: `calc(80% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-red-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[450px]">A</div>
+                    <div style={{ left: `calc(50% - ${leftValue}px)` }} className="absolute rounded-full 
+                        bg-red-600 border-[2px] border-white w-6 h-6 flex justify-center 
+                        items-center text-[13px] text-white top-[500px]">A</div>
+                </div>
             </div>
 
             {/* Button controls */}
             <div className='sm:w-[200px] w-[250px] flex flex-col justify-center items-center pb-2'>
-                <button onClick={startMatch} className='rounded-[25px] bg-green-500 text-gray-800 w-[80%] h-[40px] 
+                <button onClick={kickBall} className='rounded-[25px] bg-green-500 text-gray-800 w-[80%] h-[40px] 
                     border-[2px] border-white/60 text-[14px] font-semibold'>
                     Start Match
                 </button>
