@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Ball from "../assets/img/soccer-ball.png";
 import ballSound from "../assets/sound/ballkick1.mp3";
-import BGMatchSound from "../assets/sound/inMatchSounds1.mp3";
+import BGMatchSound from "../assets/sound/InMatchSounds1.mp3";
 
 
 function FootballPitchSimulation() {
