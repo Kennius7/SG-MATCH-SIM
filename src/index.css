@@ -22,4 +22,16 @@
     left: calc(50% - 60px);
 }
 
+.ballMotion {
+    transition: transform 0.5s ease;
+}
+
+.ballMotion2 {
+    transition: transform .1s ease;
+}
+
+
+
+
+
 
