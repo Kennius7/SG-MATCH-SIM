@@ -1,8 +1,9 @@
-// /* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from 'react';
 import Ball from "../assets/img/soccer-ball.png";
 import ballSound from "../assets/sound/ballkick1.mp3";
 import BGMatchSound from "../assets/sound/InMatchSounds1.mp3";
+
 
 
 function FootballPitchSimulation() {
@@ -35,24 +36,10 @@ function FootballPitchSimulation() {
     const [playerTurn, setPlayerTurn] = useState(false);
     const leftValue = 14;
     const [playCount, setPlayCount] = useState(0);
-    // const [velocity, setVelocity] = useState({ x: 0, y: 0 });
-    // const animationRef = useRef(null);
-    // const [trail, setTrail] = useState([]); // Store the ball's past positions
-    // const [speed, setSpeed] = useState(3);
-    // const [angle, setAngle] = useState(Math.random() * 2 * Math.PI); // Random angle in radians
-    // const [angle, setAngle] = useState(4);
+
     const matchPatternArray1 = [
-        { ref: GK_Ref },
-        { ref: LWB_Ref },
-        { ref: RWB_Ref },
-        { ref: LCB_Ref },
-        { ref: RCB_Ref },
-        { ref: LCMF_Ref },
-        { ref: RCMF_Ref },
-        { ref: LWF_Ref },
-        { ref: RWF_Ref },
-        { ref: LF_Ref },
-        { ref: RF_Ref },
+        { ref: GK_Ref }, { ref: LWB_Ref }, { ref: RWB_Ref }, { ref: LCB_Ref }, { ref: RCB_Ref }, { ref: LCMF_Ref },
+        { ref: RCMF_Ref }, { ref: LWF_Ref }, { ref: RWF_Ref }, { ref: LF_Ref }, { ref: RF_Ref },
     ];
 
     useEffect(() => {
@@ -64,6 +51,10 @@ function FootballPitchSimulation() {
 
     const [audioContext, setAudioContext] = useState(null);
     const [audioBuffer, setAudioBuffer] = useState(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [playbackPosition, setPlaybackPosition] = useState(0);
+    const sourceRef = useRef(null);
+    const startTimeRef = useRef(null);
 
     useEffect(() => {
         const initializeAudio = async () => {
@@ -83,7 +74,21 @@ function FootballPitchSimulation() {
             source.buffer = audioBuffer;
             source.loop = true;
             source.connect(audioContext.destination);
-            source.start(0);
+            source.start(0, playbackPosition);
+            startTimeRef.current = audioContext.currentTime - playbackPosition;
+            sourceRef.current = source;
+            setIsPlaying(true);
+        }
+    }
+
+    const pauseAudio = () => {
+        if (audioContext && sourceRef.current) {
+            sourceRef.current.stop();
+            sourceRef.current = null;
+
+            const elapsed = audioContext.currentTime - startTimeRef.current;
+            setPlaybackPosition(elapsed);
+            setIsPlaying(false);
         }
     }
 
@@ -198,19 +203,15 @@ function FootballPitchSimulation() {
         }
     }
 
-    const playMatchBGSound = () => {
-        if (BGSoundRef.current) {
-            BGSoundRef.current.loop = true;
-            BGSoundRef.current.play().catch((error) => console.error("Error: ", error));
-        }
+    const startMatch = () => {
+        playAudio();
     }
-    // playMatchBGSound();
-    playAudio();
 
     const resetMatch = () => {
         setIsStart(false);
         setPlayCount(0);
-        setBallPosition({ top: (footballPitchHeight / 2) - 10, left: (footballPitchWidth / 2) - 10 })
+        setBallPosition({ top: (footballPitchHeight / 2) - 10, left: (footballPitchWidth / 2) - 10 });
+        pauseAudio();
     }
 
     const kickBall = () => {
@@ -430,13 +431,13 @@ function FootballPitchSimulation() {
 
                 {/* Soccer ball */}
                 <div 
-                    className={`absolute w-[15px] h-[15px] bg-white rounded-full cursor-pointer ballMotion`}
+                    className={`absolute w-[15px] h-[15px] bg-white rounded-full cursor-pointer ballMotion 
+                        ${isStart ? "animate-pulseBorder" : "animate-none"}`}
                     style={{ transform: `translate(${ballPosition.left}px, ${ballPosition.top}px)` }}
                 >
                     <img 
                         src={Ball} 
-                        alt='Ball' 
-                        onLoad={playMatchBGSound}
+                        alt='Ball'
                         className={`w-full h-full ${isStart ? "animate-spin" : "animate-none"}`} 
                     />
                 </div>
@@ -521,17 +522,17 @@ function FootballPitchSimulation() {
 
             {/* Button controls */}
             <div className='sm:w-[200px] w-[250px] flex flex-col justify-center items-center pb-2'>
-                <button onClick={kickBall} className='rounded-[25px] bg-green-500 text-gray-800 w-[80%] h-[40px] 
+                <button onClick={startMatch} className='rounded-[25px] bg-green-500 text-gray-800 w-[80%] h-[40px] 
                     border-[2px] border-white/60 text-[14px] font-semibold'>
                     Start Match
+                </button>
+                <button onClick={kickBall} className='rounded-[25px] bg-cyan-500 text-gray-800 w-[80%] h-[40px] 
+                    border-[2px] border-white/60 text-[14px] font-semibold'>
+                    Kick Ball
                 </button>
                 <button onClick={resetMatch} className='rounded-[25px] bg-red-500 text-gray-800 w-[80%] h-[40px] 
                     border-[2px] border-white/60 text-[14px] my-2 font-semibold'>
                     Reset Match
-                </button>
-                <button onClick={switchTurn} className='rounded-[25px] bg-yellow-800 text-gray-800 w-[80%] h-[40px] 
-                    border-[2px] border-white/60 text-[13px] font-semibold'>
-                    Switch Player Turn
                 </button>
             </div>
         </section>

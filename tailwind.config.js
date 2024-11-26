@@ -16,8 +16,17 @@ export default {
         Centra1: ["Centra1", "sans-serif"],
         Centra2: ["Centra2", "sans-serif"],
         Centra3: ["Centra3", "sans-serif"],
-
       },
+      animation: {
+        pulseBorder: "pulse-border .8s infinite",
+      },
+      keyframes: {
+        "pulse-border": {
+          "0%": { boxShadow: "0 0 0 0 rgba(255, 255, 255, 0.5)" },
+          "70%": { boxShadow: "0 0 0 10px rgba(255, 255, 255, 0)" },
+          "100%": { boxShadow: "0 0 0 0 rgba(255, 255, 255, 0)" },
+        },
+      }
     },
     screens: {
       xxs: "290px",
