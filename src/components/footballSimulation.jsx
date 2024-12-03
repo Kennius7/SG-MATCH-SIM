@@ -312,15 +312,15 @@ function FootballPitchSimulation() {
                 <button onClick={startMatch} className={`rounded-[25px] bg-green-500 text-gray-800 w-[80%] h-[40px] 
                     border-[2px] border-white/60 text-[14px] font-semibold transition-transform duration-300 
                     ${isBouncing ? "animate-buttonBounce" : "animate-none" }`}>
-                    Start Match
+                    Start Match!
                 </button>
                 <button onClick={kickBall} className='rounded-[25px] bg-cyan-500 text-gray-800 w-[80%] h-[40px] 
                     border-[2px] border-white/60 text-[14px] font-semibold'>
-                    Kick Ball
+                    Kick Ball!
                 </button>
                 <button onClick={resetMatch} className='rounded-[25px] bg-red-500 text-gray-800 w-[80%] h-[40px] 
                     border-[2px] border-white/60 text-[14px] my-2 font-semibold'>
-                    Reset Match
+                    Reset Match!
                 </button>
             </div>
         </section>
