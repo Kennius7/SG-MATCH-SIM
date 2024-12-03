@@ -1,8 +1,9 @@
-/* eslint-disable no-unused-vars */
+// /* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from 'react';
 import Ball from "../assets/img/soccer-ball.png";
 import ballSound from "../assets/sound/ballkick1.mp3";
 import BGMatchSound from "../assets/sound/InMatchSounds1.mp3";
+import { getNewPos, playAudio, pauseAudio, calcPosition, goalScorePosition } from '../utils/data';
 
 
 
@@ -24,37 +25,35 @@ function FootballPitchSimulation() {
 
     const goalBottomRef = useRef(null);
     const pitchRef = useRef(null);
-
     const soundRef = useRef(null);
-    const BGSoundRef = useRef(null);
 
-    const [ballPosition, setBallPosition] = useState({ 
-        top: (footballPitchHeight / 2) - 10, left: (footballPitchWidth / 2) - 10 
-    });
+    const [ballPosition, setBallPosition] = useState({ top: (footballPitchHeight / 2) - 10, left: (footballPitchWidth / 2) - 10 });
+    const [GKPlayerPosition, setGKPlayerPosition] = useState({ top: (footballPitchHeight / 20) - 10, left: (footballPitchWidth / 2) - 15 });
 
     const [isStart, setIsStart] = useState(false);
-    const [playerTurn, setPlayerTurn] = useState(false);
-    const leftValue = 14;
     const [playCount, setPlayCount] = useState(0);
-
+    const [isBGPlaying, setIsBGPlaying] = useState(false);
+    const [audioContext, setAudioContext] = useState(null);
+    const [audioBuffer, setAudioBuffer] = useState(null);
+    const [playbackPosition, setPlaybackPosition] = useState(0);
+    const sourceRef = useRef(null);
+    const startTimeRef = useRef(null);
+    const [isBouncing, setIsBouncing] = useState(false);
+    
     const matchPatternArray1 = [
         { ref: GK_Ref }, { ref: LWB_Ref }, { ref: RWB_Ref }, { ref: LCB_Ref }, { ref: RCB_Ref }, { ref: LCMF_Ref },
         { ref: RCMF_Ref }, { ref: LWF_Ref }, { ref: RWF_Ref }, { ref: LF_Ref }, { ref: RF_Ref },
     ];
+    const leftValue = 14;
+    let posMotionValueHeight = 4;
+    let posMotionValueWidth = 4;
+
+
 
     useEffect(() => {
         soundRef.current = new Audio(ballSound);
         soundRef.current.load();
-        // BGSoundRef.current = new Audio(BGMatchSound);
-        // BGSoundRef.current.load();
     }, [])
-
-    const [audioContext, setAudioContext] = useState(null);
-    const [audioBuffer, setAudioBuffer] = useState(null);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [playbackPosition, setPlaybackPosition] = useState(0);
-    const sourceRef = useRef(null);
-    const startTimeRef = useRef(null);
 
     useEffect(() => {
         const initializeAudio = async () => {
@@ -68,134 +67,6 @@ function FootballPitchSimulation() {
         initializeAudio();
     }, []);
 
-    const playAudio = () => {
-        if (audioContext && audioBuffer) {
-            const source = audioContext.createBufferSource();
-            source.buffer = audioBuffer;
-            source.loop = true;
-            source.connect(audioContext.destination);
-            source.start(0, playbackPosition);
-            startTimeRef.current = audioContext.currentTime - playbackPosition;
-            sourceRef.current = source;
-            setIsPlaying(true);
-        }
-    }
-
-    const pauseAudio = () => {
-        if (audioContext && sourceRef.current) {
-            sourceRef.current.stop();
-            sourceRef.current = null;
-
-            const elapsed = audioContext.currentTime - startTimeRef.current;
-            setPlaybackPosition(elapsed);
-            setIsPlaying(false);
-        }
-    }
-
-
-    const calcPosition = () => {
-        if (LCMF_Ref.current) {
-            const playerPosLeft = LCMF_Ref.current.offsetLeft + 14;
-            const playerPosTop = LCMF_Ref.current.offsetTop - 5;
-            setBallPosition({
-                top: playerPosTop,
-                left: playerPosLeft,
-            })
-        }
-    }
-
-    const goalScorePosition = () => {
-        const goalRandom = Math.random() * 4;
-        if (goalBottomRef.current && goalRandom <= 2 ) {
-            const playerPosLeft = goalBottomRef.current.offsetLeft + 4;
-            const playerPosTop = goalBottomRef.current.offsetTop + 5;
-            setBallPosition({
-                top: playerPosTop,
-                left: playerPosLeft,
-            })
-        }
-        if (goalBottomRef.current && goalRandom > 2 ) {
-            const playerPosLeft = goalBottomRef.current.offsetLeft + 64;
-            const playerPosTop = goalBottomRef.current.offsetTop + 5;
-            setBallPosition({
-                top: playerPosTop,
-                left: playerPosLeft,
-            })
-        }
-    }
-
-    const getNewPos = (refA, refB) => {
-        if (refA.current && refB.current) {
-            const firstPlayerPosLeft = refA.current.offsetLeft + 14;
-            const firstPlayerPosTop = refA.current.offsetTop - 5;
-            const secondPlayerPosLeft = refB.current.offsetLeft + 14;
-            const secondPlayerPosTop = refB.current.offsetTop - 5;
-            const newPosX = secondPlayerPosLeft - firstPlayerPosLeft;
-            const newPosY = secondPlayerPosTop - firstPlayerPosTop;
-            return {
-                left: newPosX,
-                top: newPosY,
-            }
-        }
-    }
-
-    // const updatePosition = () => {
-    //     setBallPosition((pos) => {
-    //         const newTop = pos.top + velocity.y;
-    //         const newLeft = pos.left + velocity.x;
-    //         // console.log("New Top and Left:", newTop, newLeft);
-
-    //         // Boundary collision to prevent the ball from leaving the pitch
-    //         const pitchWidth = pitchRef.current.offsetWidth;
-    //         const pitchHeight = pitchRef.current.offsetHeight;
-
-    //         let updatedX = velocity.x;
-    //         let updatedY = velocity.y;
-
-
-    //         if (newTop < 0 || newTop > pitchHeight - 15) {
-    //             updatedY = -updatedY; // Reverse direction on Y axis
-    //         }
-    //         if (newLeft < 0 || newLeft > pitchWidth - 15) {
-    //             updatedX = -updatedX; // Reverse direction on X axis
-    //         }
-    //         // if (playerTurn && newTop > (pitchHeight / 2) - 15) {
-    //         //     updatedY = -updatedY;
-    //         // }
-    //         // if (!playerTurn && newTop < (pitchHeight / 2) - 15) {
-    //         //     updatedY = -updatedY;
-    //         // }
-
-    //         setVelocity({
-    //             x: updatedX * 0.98, // Apply friction
-    //             y: updatedY * 0.98,
-    //         });
-    //         // setVelocity({
-    //         //     x: updatedX, // Apply friction
-    //         //     y: updatedY,
-    //         // });
-
-    //         // Store the current position in the trail
-    //         setTrail((prevTrail) => {
-    //             const newTrail = [...prevTrail, { top: newTop, left: newLeft }];
-    //             // Limit the length of the trail array to avoid excessive memory usage
-    //             if (newTrail.length > 500) {
-    //                 newTrail.shift(); // Remove the oldest position
-    //             }
-    //             return newTrail;
-    //         });
-
-    //         return {
-    //             top: Math.min(Math.max(newTop, 0), pitchHeight - 15),
-    //             left: Math.min(Math.max(newLeft, 0), pitchWidth - 15),
-    //         };
-    //     });
-
-    //     // Stop animation if velocity is very low
-    //     // if (Math.abs(velocity.x) > 0.01 || Math.abs(velocity.y) > 0.01) {
-    //     //     animationRef.current = requestAnimationFrame(updatePosition);
-    //     // }
-    // };
 
     const playBallSound = () => {
         if (soundRef.current) {
@@ -204,57 +75,24 @@ function FootballPitchSimulation() {
     }
 
     const startMatch = () => {
-        playAudio();
+        setIsBouncing(true);
+        if (!isBGPlaying) {
+            playAudio(audioContext, audioBuffer, playbackPosition, startTimeRef, sourceRef);
+        }
+        setTimeout(() => setIsBouncing(false), 300);
+        updatePlayerPosition(GK_Ref);
+        setIsBGPlaying(true);
     }
 
     const resetMatch = () => {
         setIsStart(false);
         setPlayCount(0);
         setBallPosition({ top: (footballPitchHeight / 2) - 10, left: (footballPitchWidth / 2) - 10 });
-        pauseAudio();
+        pauseAudio(audioContext, sourceRef, startTimeRef, setPlaybackPosition );
+        setIsBGPlaying(false);
     }
 
-    const kickBall = () => {
-        setIsStart(true);
-        playBallSound();
-        if (playCount === 0) {
-            calcPosition();
-            setPlayCount(prev => prev + 1);
-            console.log("Match Count: ", playCount);
-        }
-        if (playCount === 1) {
-            updatePosition(matchPatternArray1[5].ref, matchPatternArray1[6].ref);
-            setPlayCount(prev => prev + 1);
-            console.log("Match Count: ", playCount);
-        }
-        if (playCount === 2) {
-            updatePosition(matchPatternArray1[6].ref, matchPatternArray1[7].ref);
-            setPlayCount(prev => prev + 1);
-            console.log("Match Count: ", playCount);
-        }
-        if (playCount === 3) {
-            updatePosition(matchPatternArray1[7].ref, matchPatternArray1[8].ref);
-            setPlayCount(prev => prev + 1);
-            console.log("Match Count: ", playCount);
-        }
-        if (playCount === 4) {
-            updatePosition(matchPatternArray1[8].ref, matchPatternArray1[9].ref);
-            setPlayCount(prev => prev + 1);
-            console.log("Match Count: ", playCount);
-        }
-        if (playCount === 5) {
-            updatePosition(matchPatternArray1[9].ref, matchPatternArray1[10].ref);
-            setPlayCount(prev => prev + 1);
-            console.log("Match Count: ", playCount);
-        }
-        if (playCount === 6) {
-            goalScorePosition();
-            setPlayCount(prev => prev + 1);
-            console.log("Match Count: ", playCount);
-        }
-    };
-
-    const updatePosition = (refA, refB) => {
+    const updateBallPosition = (refA, refB) => {
         setBallPosition((pos) => {
             const newTop = pos.top + getNewPos(refA, refB).top;
             const newLeft = pos.left + getNewPos(refA, refB).left;
@@ -262,130 +100,76 @@ function FootballPitchSimulation() {
         });
     };
 
-    const switchTurn = () => {
-        setPlayerTurn(!playerTurn);
+    const updatePlayerPosition = (ref) => {
+        if (ref === GK_Ref) {
+            setInterval(() => {
+                setGKPlayerPosition((pos) => {
+                    const newTop = pos.top + posMotionValueHeight;
+                    const newLeft = pos.left + posMotionValueWidth;
+
+                    if (newTop < 0 || newTop > footballPitchHeight * 0.1) {
+                        // setPosMotionValueHeight((pos) => {
+                        //     const newPos = pos * -1;
+                        //     console.log("New Value: ", newPos);
+                        //     return newPos;
+                        // });
+                        posMotionValueHeight = posMotionValueHeight * -1;
+                        console.log("NewTop: ", newTop, "NewLeft: ", newLeft);
+                        return { top: newTop, left: newLeft};
+                    }
+                    if (newLeft < Math.round(footballPitchWidth * 0.3) || newLeft > Math.round(footballPitchWidth * 0.66)) {
+                        // setPosMotionValueWidth(prev => prev * -1);
+                        posMotionValueWidth = posMotionValueWidth * -1;
+                        console.log("NewTop: ", newTop, "NewLeft: ", newLeft);
+                        return { top: newTop, left: newLeft};
+                    }
+                    console.log("NewTop: ", newTop, "NewLeft: ", newLeft);
+                    return { top: newTop, left: newLeft};
+                });
+            }, 500);
+        }
     }
 
+    const kickBall = () => {
+        setIsStart(true);
+        playBallSound();
+        if (playCount === 0) {
+            calcPosition(LCMF_Ref, setBallPosition);
+            setPlayCount(prev => prev + 1);
+            console.log("Match Count: ", playCount);
+        }
+        if (playCount === 1) {
+            updateBallPosition(matchPatternArray1[5].ref, matchPatternArray1[6].ref);
+            setPlayCount(prev => prev + 1);
+            console.log("Match Count: ", playCount);
+        }
+        if (playCount === 2) {
+            updateBallPosition(matchPatternArray1[6].ref, matchPatternArray1[7].ref);
+            setPlayCount(prev => prev + 1);
+            console.log("Match Count: ", playCount);
+        }
+        if (playCount === 3) {
+            updateBallPosition(matchPatternArray1[7].ref, matchPatternArray1[8].ref);
+            setPlayCount(prev => prev + 1);
+            console.log("Match Count: ", playCount);
+        }
+        if (playCount === 4) {
+            updateBallPosition(matchPatternArray1[8].ref, matchPatternArray1[9].ref);
+            setPlayCount(prev => prev + 1);
+            console.log("Match Count: ", playCount);
+        }
+        if (playCount === 5) {
+            updateBallPosition(matchPatternArray1[9].ref, matchPatternArray1[10].ref);
+            setPlayCount(prev => prev + 1);
+            console.log("Match Count: ", playCount);
+        }
+        if (playCount === 6) {
+            goalScorePosition(goalBottomRef, setBallPosition);
+            setPlayCount(prev => prev + 1);
+            console.log("Match Count: ", playCount);
+        }
+    };
 
-  // Update ball position based on velocity with friction to slow it down
-    // useEffect(() => {
-    //     // const updatePosition = () => {
-    //     //     setBallPosition((pos) => {
-    //     //         const newTop = pos.top + velocity.y;
-    //     //         const newLeft = pos.left + velocity.x;
-    //     //         // console.log("New Top and Left:", newTop, newLeft);
-
-    //     //         // Boundary collision to prevent the ball from leaving the pitch
-    //     //         const pitchWidth = pitchRef.current.offsetWidth;
-    //     //         const pitchHeight = pitchRef.current.offsetHeight;
-
-    //     //         let updatedX = velocity.x;
-    //     //         let updatedY = velocity.y;
-
-
-    //     //         if (newTop < 0 || newTop > pitchHeight - 15) {
-    //     //             updatedY = -updatedY; // Reverse direction on Y axis
-    //     //         }
-    //     //         if (newLeft < 0 || newLeft > pitchWidth - 15) {
-    //     //             updatedX = -updatedX; // Reverse direction on X axis
-    //     //         }
-    //     //         // if (playerTurn && newTop > (pitchHeight / 2) - 15) {
-    //     //         //     updatedY = -updatedY;
-    //     //         // }
-    //     //         // if (!playerTurn && newTop < (pitchHeight / 2) - 15) {
-    //     //         //     updatedY = -updatedY;
-    //     //         // }
-
-    //     //         setVelocity({
-    //     //             x: updatedX * 0.98, // Apply friction
-    //     //             y: updatedY * 0.98,
-    //     //         });
-    //     //         // setVelocity({
-    //     //         //     x: updatedX, // Apply friction
-    //     //         //     y: updatedY,
-    //     //         // });
-
-    //     //         // Store the current position in the trail
-    //     //         setTrail((prevTrail) => {
-    //     //             const newTrail = [...prevTrail, { top: newTop, left: newLeft }];
-    //     //             // Limit the length of the trail array to avoid excessive memory usage
-    //     //             if (newTrail.length > 500) {
-    //     //                 newTrail.shift(); // Remove the oldest position
-    //     //             }
-    //     //             return newTrail;
-    //     //         });
-
-    //     //         return {
-    //     //             top: Math.min(Math.max(newTop, 0), pitchHeight - 15),
-    //     //             left: Math.min(Math.max(newLeft, 0), pitchWidth - 15),
-    //     //         };
-    //     //     });
-
-    //     //     // Stop animation if velocity is very low
-    //     //     if (Math.abs(velocity.x) > 0.01 || Math.abs(velocity.y) > 0.01) {
-    //     //         animationRef.current = requestAnimationFrame(updatePosition);
-    //     //     }
-    //     // };
-
-    //     const updatePosition = () => {
-    //         setBallPosition((pos) => {
-    //             const newTop = pos.top + getVelocity(LCMF_Ref, RCMF_Ref).top/20;
-    //             const newLeft = pos.left + getVelocity(LCMF_Ref, RCMF_Ref).left/20;
-    //             console.log("Velocity Left: ", getVelocity(LCMF_Ref, RCMF_Ref).left/20, "Velocity Top: ", getVelocity(LCMF_Ref, RCMF_Ref).top/20);
-    
-    //             // Boundary collision to prevent the ball from leaving the pitch
-    //             const pitchWidth = pitchRef.current.offsetWidth;
-    //             const pitchHeight = pitchRef.current.offsetHeight;
-    
-    //             let updatedX = getVelocity(LCMF_Ref, RCMF_Ref).left/20;
-    //             let updatedY = getVelocity(LCMF_Ref, RCMF_Ref).top/20;
-    
-    
-    //             if (newTop < 0 || newTop > pitchHeight - 15) {
-    //                 updatedY = -updatedY; // Reverse direction on Y axis
-    //             }
-    //             if (newLeft < 0 || newLeft > pitchWidth - 15) {
-    //                 updatedX = -updatedX; // Reverse direction on X axis
-    //             }
-    //             // if (playerTurn && newTop > (pitchHeight / 2) - 15) {
-    //             //     updatedY = -updatedY;
-    //             // }
-    //             // if (!playerTurn && newTop < (pitchHeight / 2) - 15) {
-    //             //     updatedY = -updatedY;
-    //             // }
-    
-    //             setVelocity({
-    //                 x: updatedX * 0.98, // Apply friction
-    //                 y: updatedY * 0.98,
-    //             });
-    //             // setVelocity({
-    //             //     x: updatedX, // Apply friction
-    //             //     y: updatedY,
-    //             // });
-    
-    //             // Store the current position in the trail
-    //             setTrail((prevTrail) => {
-    //                 const newTrail = [...prevTrail, { top: newTop, left: newLeft }];
-    //                 // Limit the length of the trail array to avoid excessive memory usage
-    //                 if (newTrail.length > 500) {
-    //                     newTrail.shift(); // Remove the oldest position
-    //                 }
-    //                 return newTrail;
-    //             });
-    
-    //             return {
-    //                 top: Math.min(Math.max(newTop, 0), pitchHeight - 15),
-    //                 left: Math.min(Math.max(newLeft, 0), pitchWidth - 15),
-    //             };
-    //         });
-    //     };
-
-    //     // Start animation
-    //     animationRef.current = requestAnimationFrame(updatePosition);
-
-    //     // Cleanup animation on component unmount
-    //     return () => cancelAnimationFrame(animationRef.current);
-    // }, [velocity]);
 
 
     return (
@@ -407,9 +191,9 @@ function FootballPitchSimulation() {
                     className='absolute top-[50%] left-0 w-full h-[1px] bg-white border-[0.5px] border-white'>
                 </div>
                 {/* Goal Box Top */}
-                <div className={`absolute leftCalc1 top-0 w-[80px] h-[20px] ${playerTurn ? "bg-[#a6f1af]" : "bg-white"}`}></div>
+                <div className={`absolute leftCalc1 top-0 w-[80px] h-[20px] bg-white`}></div>
                 {/* Goal Box Bottom */}
-                <div ref={goalBottomRef} className={`absolute leftCalc1 bottom-0 w-[80px] h-[20px] ${!playerTurn ? "bg-[#a6f1af]" : "bg-white"}`}></div>
+                <div ref={goalBottomRef} className={`absolute leftCalc1 bottom-0 w-[80px] h-[20px] bg-white`}></div>
                 {/* 18 Yard Box Top */}
                 <div className='absolute leftCalc2 top-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div>
                 {/* 18 Yard Box Bottom */}
@@ -445,9 +229,12 @@ function FootballPitchSimulation() {
                 {/* Players */}
                 <div className={`absolute top-0 left-0 w-[320px] h-[550px] bg-transparent`}>
                     {/* Home Players */}
-                    <div ref={GK_Ref} style={{ left: `calc(50% - ${leftValue}px)` }} className="absolute rounded-full 
-                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
-                        items-center text-[13px] text-white top-[20px]">H</div>
+                    <div 
+                        ref={GK_Ref} 
+                        style={{ transform: `translate(${GKPlayerPosition.left}px, ${GKPlayerPosition.top}px)` }} 
+                        className="absolute rounded-full bg-cyan-600 border-[2px] border-white w-6 h-6 
+                        flex justify-center items-center text-[11px] text-white ballMotion">GK</div>
+
                     <div ref={LWB_Ref} style={{ left: `calc(20% - ${leftValue}px)` }} className="absolute rounded-full 
                         bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
                         items-center text-[13px] text-white top-[84px]">H</div>
@@ -522,8 +309,9 @@ function FootballPitchSimulation() {
 
             {/* Button controls */}
             <div className='sm:w-[200px] w-[250px] flex flex-col justify-center items-center pb-2'>
-                <button onClick={startMatch} className='rounded-[25px] bg-green-500 text-gray-800 w-[80%] h-[40px] 
-                    border-[2px] border-white/60 text-[14px] font-semibold'>
+                <button onClick={startMatch} className={`rounded-[25px] bg-green-500 text-gray-800 w-[80%] h-[40px] 
+                    border-[2px] border-white/60 text-[14px] font-semibold transition-transform duration-300 
+                    ${isBouncing ? "animate-buttonBounce" : "animate-none" }`}>
                     Start Match
                 </button>
                 <button onClick={kickBall} className='rounded-[25px] bg-cyan-500 text-gray-800 w-[80%] h-[40px] 

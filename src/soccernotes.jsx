@@ -772,3 +772,195 @@
 
 
 
+
+
+
+    // const updatePosition = () => {
+    //     setBallPosition((pos) => {
+    //         const newTop = pos.top + velocity.y;
+    //         const newLeft = pos.left + velocity.x;
+    //         // console.log("New Top and Left:", newTop, newLeft);
+
+    //         // Boundary collision to prevent the ball from leaving the pitch
+    //         const pitchWidth = pitchRef.current.offsetWidth;
+    //         const pitchHeight = pitchRef.current.offsetHeight;
+
+    //         let updatedX = velocity.x;
+    //         let updatedY = velocity.y;
+
+
+    //         if (newTop < 0 || newTop > pitchHeight - 15) {
+    //             updatedY = -updatedY; // Reverse direction on Y axis
+    //         }
+    //         if (newLeft < 0 || newLeft > pitchWidth - 15) {
+    //             updatedX = -updatedX; // Reverse direction on X axis
+    //         }
+    //         // if (playerTurn && newTop > (pitchHeight / 2) - 15) {
+    //         //     updatedY = -updatedY;
+    //         // }
+    //         // if (!playerTurn && newTop < (pitchHeight / 2) - 15) {
+    //         //     updatedY = -updatedY;
+    //         // }
+
+    //         setVelocity({
+    //             x: updatedX * 0.98, // Apply friction
+    //             y: updatedY * 0.98,
+    //         });
+    //         // setVelocity({
+    //         //     x: updatedX, // Apply friction
+    //         //     y: updatedY,
+    //         // });
+
+    //         // Store the current position in the trail
+    //         setTrail((prevTrail) => {
+    //             const newTrail = [...prevTrail, { top: newTop, left: newLeft }];
+    //             // Limit the length of the trail array to avoid excessive memory usage
+    //             if (newTrail.length > 500) {
+    //                 newTrail.shift(); // Remove the oldest position
+    //             }
+    //             return newTrail;
+    //         });
+
+    //         return {
+    //             top: Math.min(Math.max(newTop, 0), pitchHeight - 15),
+    //             left: Math.min(Math.max(newLeft, 0), pitchWidth - 15),
+    //         };
+    //     });
+
+    //     // Stop animation if velocity is very low
+    //     // if (Math.abs(velocity.x) > 0.01 || Math.abs(velocity.y) > 0.01) {
+    //     //     animationRef.current = requestAnimationFrame(updatePosition);
+    //     // }
+    // };
+
+
+
+
+
+
+
+
+      // Update ball position based on velocity with friction to slow it down
+    // useEffect(() => {
+    //     // const updatePosition = () => {
+    //     //     setBallPosition((pos) => {
+    //     //         const newTop = pos.top + velocity.y;
+    //     //         const newLeft = pos.left + velocity.x;
+    //     //         // console.log("New Top and Left:", newTop, newLeft);
+
+    //     //         // Boundary collision to prevent the ball from leaving the pitch
+    //     //         const pitchWidth = pitchRef.current.offsetWidth;
+    //     //         const pitchHeight = pitchRef.current.offsetHeight;
+
+    //     //         let updatedX = velocity.x;
+    //     //         let updatedY = velocity.y;
+
+
+    //     //         if (newTop < 0 || newTop > pitchHeight - 15) {
+    //     //             updatedY = -updatedY; // Reverse direction on Y axis
+    //     //         }
+    //     //         if (newLeft < 0 || newLeft > pitchWidth - 15) {
+    //     //             updatedX = -updatedX; // Reverse direction on X axis
+    //     //         }
+    //     //         // if (playerTurn && newTop > (pitchHeight / 2) - 15) {
+    //     //         //     updatedY = -updatedY;
+    //     //         // }
+    //     //         // if (!playerTurn && newTop < (pitchHeight / 2) - 15) {
+    //     //         //     updatedY = -updatedY;
+    //     //         // }
+
+    //     //         setVelocity({
+    //     //             x: updatedX * 0.98, // Apply friction
+    //     //             y: updatedY * 0.98,
+    //     //         });
+    //     //         // setVelocity({
+    //     //         //     x: updatedX, // Apply friction
+    //     //         //     y: updatedY,
+    //     //         // });
+
+    //     //         // Store the current position in the trail
+    //     //         setTrail((prevTrail) => {
+    //     //             const newTrail = [...prevTrail, { top: newTop, left: newLeft }];
+    //     //             // Limit the length of the trail array to avoid excessive memory usage
+    //     //             if (newTrail.length > 500) {
+    //     //                 newTrail.shift(); // Remove the oldest position
+    //     //             }
+    //     //             return newTrail;
+    //     //         });
+
+    //     //         return {
+    //     //             top: Math.min(Math.max(newTop, 0), pitchHeight - 15),
+    //     //             left: Math.min(Math.max(newLeft, 0), pitchWidth - 15),
+    //     //         };
+    //     //     });
+
+    //     //     // Stop animation if velocity is very low
+    //     //     if (Math.abs(velocity.x) > 0.01 || Math.abs(velocity.y) > 0.01) {
+    //     //         animationRef.current = requestAnimationFrame(updatePosition);
+    //     //     }
+    //     // };
+
+    //     const updatePosition = () => {
+    //         setBallPosition((pos) => {
+    //             const newTop = pos.top + getVelocity(LCMF_Ref, RCMF_Ref).top/20;
+    //             const newLeft = pos.left + getVelocity(LCMF_Ref, RCMF_Ref).left/20;
+    //             console.log("Velocity Left: ", getVelocity(LCMF_Ref, RCMF_Ref).left/20, "Velocity Top: ", getVelocity(LCMF_Ref, RCMF_Ref).top/20);
+    
+    //             // Boundary collision to prevent the ball from leaving the pitch
+    //             const pitchWidth = pitchRef.current.offsetWidth;
+    //             const pitchHeight = pitchRef.current.offsetHeight;
+    
+    //             let updatedX = getVelocity(LCMF_Ref, RCMF_Ref).left/20;
+    //             let updatedY = getVelocity(LCMF_Ref, RCMF_Ref).top/20;
+    
+    
+    //             if (newTop < 0 || newTop > pitchHeight - 15) {
+    //                 updatedY = -updatedY; // Reverse direction on Y axis
+    //             }
+    //             if (newLeft < 0 || newLeft > pitchWidth - 15) {
+    //                 updatedX = -updatedX; // Reverse direction on X axis
+    //             }
+    //             // if (playerTurn && newTop > (pitchHeight / 2) - 15) {
+    //             //     updatedY = -updatedY;
+    //             // }
+    //             // if (!playerTurn && newTop < (pitchHeight / 2) - 15) {
+    //             //     updatedY = -updatedY;
+    //             // }
+    
+    //             setVelocity({
+    //                 x: updatedX * 0.98, // Apply friction
+    //                 y: updatedY * 0.98,
+    //             });
+    //             // setVelocity({
+    //             //     x: updatedX, // Apply friction
+    //             //     y: updatedY,
+    //             // });
+    
+    //             // Store the current position in the trail
+    //             setTrail((prevTrail) => {
+    //                 const newTrail = [...prevTrail, { top: newTop, left: newLeft }];
+    //                 // Limit the length of the trail array to avoid excessive memory usage
+    //                 if (newTrail.length > 500) {
+    //                     newTrail.shift(); // Remove the oldest position
+    //                 }
+    //                 return newTrail;
+    //             });
+    
+    //             return {
+    //                 top: Math.min(Math.max(newTop, 0), pitchHeight - 15),
+    //                 left: Math.min(Math.max(newLeft, 0), pitchWidth - 15),
+    //             };
+    //         });
+    //     };
+
+    //     // Start animation
+    //     animationRef.current = requestAnimationFrame(updatePosition);
+
+    //     // Cleanup animation on component unmount
+    //     return () => cancelAnimationFrame(animationRef.current);
+    // }, [velocity]);
+
+
+
+
+
