@@ -1,5 +1,9 @@
 
 
+
+let playerPosInterval;
+
+
 export const getNewPos = (refA, refB) => {
     if (refA.current && refB.current) {
         const firstPlayerPosLeft = refA.current.offsetLeft + 14;
@@ -69,7 +73,44 @@ export const goalScorePosition = (goalPostRef, setPosition) => {
 
 
 
+export const updatePlayerPosition = (
+    playerPosFunction, heightValue, widthValue, polarity, footballPitchHeight, footballPitchWidth,
+    topBoundaryPitchHeightDivisor, topBoundaryPitchHeightSubtractor, bottomBoundaryPitchHeightDivisor,
+    bottomBoundaryPitchHeightSubtractor, leftBoundaryPitchWidthDivisor, leftBoundaryPitchWidthSubtractor,
+    rightBoundaryPitchWidthDivisor, rightBoundaryPitchWidthSubtractor, isClearInterval,
+) => {
+    let playerInterval = setInterval(() => {
+        playerPosFunction((pos) => {
+            const newTop = pos.top + (heightValue * polarity);
+            const newLeft = pos.left + (widthValue * polarity);
+
+            if (newTop < Math.round((footballPitchHeight / topBoundaryPitchHeightDivisor) + topBoundaryPitchHeightSubtractor) 
+                || newTop > Math.round((footballPitchHeight / bottomBoundaryPitchHeightDivisor) + bottomBoundaryPitchHeightSubtractor)) {
+                heightValue = heightValue * -1;
+                // console.log("NewTop: ", newTop, "NewLeft: ", newLeft, "Random Polarity: ", polarity);
+                return { top: newTop, left: newLeft};
+            }
+            if (newLeft < Math.round((footballPitchWidth / leftBoundaryPitchWidthDivisor) + leftBoundaryPitchWidthSubtractor) 
+                || newLeft > Math.round((footballPitchWidth / rightBoundaryPitchWidthDivisor) + rightBoundaryPitchWidthSubtractor)) {
+                widthValue = widthValue * -1;
+                // console.log("NewTop: ", newTop, "NewLeft: ", newLeft, "Polarity: ", polarity);
+                return { top: newTop, left: newLeft};
+            }
+            // console.log("NewTop: ", newTop, "NewLeft: ", newLeft, "Normal Polarity: ", polarity);
+            return { top: newTop, left: newLeft};
+        });
+    }, 300);
+
+    if (isClearInterval) {
+        clearInterval(playerInterval);
+        console.log("Cleared...");
+    }
+
+    // playerPosInterval = playerInterval;
+}
 
 
 
 
+
+export default playerPosInterval;

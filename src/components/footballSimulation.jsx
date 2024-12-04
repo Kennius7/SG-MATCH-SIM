@@ -3,7 +3,8 @@ import { useState, useEffect, useRef } from 'react';
 import Ball from "../assets/img/soccer-ball.png";
 import ballSound from "../assets/sound/ballkick1.mp3";
 import BGMatchSound from "../assets/sound/InMatchSounds1.mp3";
-import { getNewPos, playAudio, pauseAudio, calcPosition, goalScorePosition } from '../utils/data';
+import { getNewPos, playAudio, pauseAudio, calcPosition, goalScorePosition, updatePlayerPosition } from '../utils/data';
+import { playerPosData } from '../utils/playerPositionData';
 
 
 
@@ -29,6 +30,10 @@ function FootballPitchSimulation() {
 
     const [ballPosition, setBallPosition] = useState({ top: (footballPitchHeight / 2) - 10, left: (footballPitchWidth / 2) - 10 });
     const [GKPlayerPosition, setGKPlayerPosition] = useState({ top: (footballPitchHeight / 20) - 10, left: (footballPitchWidth / 2) - 15 });
+    const [LWBPlayerPosition, setLWBPlayerPosition] = useState({ top: (footballPitchHeight / 6) - 10, left: (footballPitchWidth / 5) - 15 });
+    const [RWBPlayerPosition, setRWBPlayerPosition] = useState({ top: (footballPitchHeight / 6) - 10, left: ((footballPitchWidth / 5) * 2) - 15 });
+    const [LCBPlayerPosition, setLCBPlayerPosition] = useState({ top: (footballPitchHeight / 6) - 10, left: ((footballPitchWidth / 5) * 3) - 15 });
+    const [RCBPlayerPosition, setRCBPlayerPosition] = useState({ top: (footballPitchHeight / 6) - 10, left: ((footballPitchWidth / 5) * 4) - 15 });
 
     const [isStart, setIsStart] = useState(false);
     const [playCount, setPlayCount] = useState(0);
@@ -39,20 +44,44 @@ function FootballPitchSimulation() {
     const sourceRef = useRef(null);
     const startTimeRef = useRef(null);
     const [isBouncing, setIsBouncing] = useState(false);
+    const [polarity1, setPolarity1] = useState(1);
+    const [polarity2, setPolarity2] = useState(-1);
+    const [isClearInterval, setIsClearInterval] = useState(false);
     
     const matchPatternArray1 = [
         { ref: GK_Ref }, { ref: LWB_Ref }, { ref: RWB_Ref }, { ref: LCB_Ref }, { ref: RCB_Ref }, { ref: LCMF_Ref },
         { ref: RCMF_Ref }, { ref: LWF_Ref }, { ref: RWF_Ref }, { ref: LF_Ref }, { ref: RF_Ref },
     ];
     const leftValue = 14;
-    let posMotionValueHeight = 4;
-    let posMotionValueWidth = 4;
+    let posMotionValueHeight = 2;
+    let posMotionValueWidth = 2;
 
 
 
     useEffect(() => {
         soundRef.current = new Audio(ballSound);
         soundRef.current.load();
+    }, [])
+
+    useEffect(() => {
+        const polarityInterval = setInterval(() => {
+            const rand = Math.round(Math.random() * 4);
+            // console.log("!!!!!!!!!!!Random Num: ", rand);
+            if (rand <= 2) {
+                setPolarity1(-1);
+                setPolarity2(1);
+                // console.log("=======>Polarity Num1: ", polarity);
+            } else { 
+                setPolarity1(1);
+                setPolarity2(-1);
+                // console.log("=======>Polarity Num2: ", polarity);
+            }
+        }, 2000)
+    
+        return () => {
+            clearInterval(polarityInterval);
+        }
+
     }, [])
 
     useEffect(() => {
@@ -78,18 +107,58 @@ function FootballPitchSimulation() {
         setIsBouncing(true);
         if (!isBGPlaying) {
             playAudio(audioContext, audioBuffer, playbackPosition, startTimeRef, sourceRef);
+            updatePlayerPosition(
+                setGKPlayerPosition, posMotionValueHeight, posMotionValueWidth, polarity1, footballPitchHeight,
+                footballPitchWidth, playerPosData.GK_POS.topDiv, playerPosData.GK_POS.topSub,
+                playerPosData.GK_POS.bottomDiv, playerPosData.GK_POS.bottomSub, playerPosData.GK_POS.leftDiv,
+                playerPosData.GK_POS.leftSub, playerPosData.GK_POS.rightDiv, playerPosData.GK_POS.rightSub, 
+                isClearInterval
+            );
+            updatePlayerPosition(
+                setLWBPlayerPosition, posMotionValueHeight, posMotionValueWidth, polarity2, footballPitchHeight,
+                footballPitchWidth, playerPosData.LWB_POS.topDiv, playerPosData.LWB_POS.topSub,
+                playerPosData.LWB_POS.bottomDiv, playerPosData.LWB_POS.bottomSub, playerPosData.LWB_POS.leftDiv,
+                playerPosData.LWB_POS.leftSub, playerPosData.LWB_POS.rightDiv, playerPosData.LWB_POS.rightSub, 
+                isClearInterval
+            );
+            updatePlayerPosition(
+                setRWBPlayerPosition, posMotionValueHeight, posMotionValueWidth, polarity1, footballPitchHeight,
+                footballPitchWidth, playerPosData.RWB_POS.topDiv, playerPosData.RWB_POS.topSub,
+                playerPosData.RWB_POS.bottomDiv, playerPosData.RWB_POS.bottomSub, playerPosData.RWB_POS.leftDiv,
+                playerPosData.RWB_POS.leftSub, playerPosData.RWB_POS.rightDiv, playerPosData.RWB_POS.rightSub, 
+                isClearInterval
+            );
+            updatePlayerPosition(
+                setLCBPlayerPosition, posMotionValueHeight, posMotionValueWidth, polarity2, footballPitchHeight,
+                footballPitchWidth, playerPosData.LCB_POS.topDiv, playerPosData.LCB_POS.topSub,
+                playerPosData.LCB_POS.bottomDiv, playerPosData.LCB_POS.bottomSub, playerPosData.LCB_POS.leftDiv,
+                playerPosData.LCB_POS.leftSub, playerPosData.LCB_POS.rightDiv, playerPosData.LCB_POS.rightSub, 
+                isClearInterval
+            );
+            updatePlayerPosition(
+                setRCBPlayerPosition, posMotionValueHeight, posMotionValueWidth, polarity1, footballPitchHeight,
+                footballPitchWidth, playerPosData.RCB_POS.topDiv, playerPosData.RCB_POS.topSub,
+                playerPosData.RCB_POS.bottomDiv, playerPosData.RCB_POS.bottomSub, playerPosData.RCB_POS.leftDiv,
+                playerPosData.RCB_POS.leftSub, playerPosData.RCB_POS.rightDiv, playerPosData.RCB_POS.rightSub, 
+                isClearInterval
+            );
         }
         setTimeout(() => setIsBouncing(false), 300);
-        updatePlayerPosition(GK_Ref);
         setIsBGPlaying(true);
     }
 
     const resetMatch = () => {
         setIsStart(false);
         setPlayCount(0);
-        setBallPosition({ top: (footballPitchHeight / 2) - 10, left: (footballPitchWidth / 2) - 10 });
-        pauseAudio(audioContext, sourceRef, startTimeRef, setPlaybackPosition );
         setIsBGPlaying(false);
+        setIsClearInterval(true);
+        setBallPosition({ top: (footballPitchHeight / 2) - 10, left: (footballPitchWidth / 2) - 10 });
+        setGKPlayerPosition({ top: (footballPitchHeight / 20) - 10, left: (footballPitchWidth / 2) - 15 });
+        setLWBPlayerPosition({ top: (footballPitchHeight / 6) - 10, left: (footballPitchWidth / 5) - 15 });
+        setRWBPlayerPosition({ top: (footballPitchHeight / 6) - 10, left: ((footballPitchWidth / 5) * 2) - 15 });
+        setLCBPlayerPosition({ top: (footballPitchHeight / 6) - 10, left: ((footballPitchWidth / 5) * 3) - 15 });
+        setRCBPlayerPosition({ top: (footballPitchHeight / 6) - 10, left: ((footballPitchWidth / 5) * 4) - 15 });
+        pauseAudio(audioContext, sourceRef, startTimeRef, setPlaybackPosition );
     }
 
     const updateBallPosition = (refA, refB) => {
@@ -100,35 +169,29 @@ function FootballPitchSimulation() {
         });
     };
 
-    const updatePlayerPosition = (ref) => {
-        if (ref === GK_Ref) {
-            setInterval(() => {
-                setGKPlayerPosition((pos) => {
-                    const newTop = pos.top + posMotionValueHeight;
-                    const newLeft = pos.left + posMotionValueWidth;
+    // const updatePlayerPosition = (ref) => {
+    //     if (ref === GK_Ref) {
+    //         setInterval(() => {
+    //             setGKPlayerPosition((pos) => {
+    //                 const newTop = pos.top + (posMotionValueHeight * polarity);
+    //                 const newLeft = pos.left + (posMotionValueWidth * polarity);
 
-                    if (newTop < 0 || newTop > footballPitchHeight * 0.1) {
-                        // setPosMotionValueHeight((pos) => {
-                        //     const newPos = pos * -1;
-                        //     console.log("New Value: ", newPos);
-                        //     return newPos;
-                        // });
-                        posMotionValueHeight = posMotionValueHeight * -1;
-                        console.log("NewTop: ", newTop, "NewLeft: ", newLeft);
-                        return { top: newTop, left: newLeft};
-                    }
-                    if (newLeft < Math.round(footballPitchWidth * 0.3) || newLeft > Math.round(footballPitchWidth * 0.66)) {
-                        // setPosMotionValueWidth(prev => prev * -1);
-                        posMotionValueWidth = posMotionValueWidth * -1;
-                        console.log("NewTop: ", newTop, "NewLeft: ", newLeft);
-                        return { top: newTop, left: newLeft};
-                    }
-                    console.log("NewTop: ", newTop, "NewLeft: ", newLeft);
-                    return { top: newTop, left: newLeft};
-                });
-            }, 500);
-        }
-    }
+    //                 if (newTop < ((footballPitchHeight / 20) - 14) || newTop > ((footballPitchHeight / 20) - 6)) {
+    //                     posMotionValueHeight = posMotionValueHeight * -1;
+    //                     // console.log("NewTop: ", newTop, "NewLeft: ", newLeft, "Random Polarity: ", polarity);
+    //                     return { top: newTop, left: newLeft};
+    //                 }
+    //                 if (newLeft < Math.round((footballPitchWidth / 2) - 16) || newLeft > Math.round((footballPitchWidth / 2) - 10)) {
+    //                     posMotionValueWidth = posMotionValueWidth * -1;
+    //                     // console.log("NewTop: ", newTop, "NewLeft: ", newLeft, "Polarity: ", polarity);
+    //                     return { top: newTop, left: newLeft};
+    //                 }
+    //                 // console.log("NewTop: ", newTop, "NewLeft: ", newLeft, "Normal Polarity: ", polarity);
+    //                 return { top: newTop, left: newLeft};
+    //             });
+    //         }, 500);
+    //     }
+    // }
 
     const kickBall = () => {
         setIsStart(true);
@@ -235,19 +298,30 @@ function FootballPitchSimulation() {
                         className="absolute rounded-full bg-cyan-600 border-[2px] border-white w-6 h-6 
                         flex justify-center items-center text-[11px] text-white ballMotion">GK</div>
 
-                    <div ref={LWB_Ref} style={{ left: `calc(20% - ${leftValue}px)` }} className="absolute rounded-full 
-                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
-                        items-center text-[13px] text-white top-[84px]">H</div>
-                    <div ref={LCB_Ref} style={{ left: `calc(40% - ${leftValue}px)` }} className="absolute rounded-full 
-                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
-                        items-center text-[13px] text-white top-[84px]">H</div>
-                    <div ref={RCB_Ref} style={{ left: `calc(60% - ${leftValue}px)` }} className="absolute rounded-full 
-                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
-                        items-center text-[13px] text-white top-[84px]">H</div>
-                    <div ref={RWB_Ref} style={{ left: `calc(80% - ${leftValue}px)` }} className="absolute rounded-full 
-                        bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
-                        items-center text-[13px] text-white top-[84px]">H</div>
-                    
+                    <div 
+                        ref={LWB_Ref} 
+                        style={{ transform: `translate(${LWBPlayerPosition.left}px, ${LWBPlayerPosition.top}px)` }} 
+                        className="absolute rounded-full bg-cyan-600 border-[2px] border-white w-6 h-6 flex 
+                        justify-center items-center text-[9px] text-white ballMotion">LWB</div>
+
+                    <div 
+                        ref={LCB_Ref} 
+                        style={{ transform: `translate(${LCBPlayerPosition.left}px, ${LCBPlayerPosition.top}px)` }} 
+                        className="absolute rounded-full bg-cyan-600 border-[2px] border-white w-6 h-6 flex 
+                        justify-center items-center text-[9px] text-white ballMotion">LCB</div>
+
+                    <div 
+                        ref={RCB_Ref} 
+                        style={{ transform: `translate(${RCBPlayerPosition.left}px, ${RCBPlayerPosition.top}px)` }} 
+                        className="absolute rounded-full bg-cyan-600 border-[2px] border-white w-6 h-6 flex 
+                        justify-center items-center text-[9px] text-white ballMotion">RCB</div>
+
+                    <div 
+                        ref={RWB_Ref} 
+                        style={{ transform: `translate(${RWBPlayerPosition.left}px, ${RWBPlayerPosition.top}px)` }} 
+                        className="absolute rounded-full bg-cyan-600 border-[2px] border-white w-6 h-6 flex 
+                        justify-center items-center text-[9px] text-white ballMotion">RWB</div>
+
                     <div ref={LWF_Ref} style={{ left: `calc(20% - ${leftValue}px)` }} className="absolute rounded-full 
                         bg-cyan-600 border-[2px] border-white w-6 h-6 flex justify-center 
                         items-center text-[13px] text-white top-[250px]">H</div>
@@ -312,15 +386,15 @@ function FootballPitchSimulation() {
                 <button onClick={startMatch} className={`rounded-[25px] bg-green-500 text-gray-800 w-[80%] h-[40px] 
                     border-[2px] border-white/60 text-[14px] font-semibold transition-transform duration-300 
                     ${isBouncing ? "animate-buttonBounce" : "animate-none" }`}>
-                    Start Match!
+                    Start Match
                 </button>
                 <button onClick={kickBall} className='rounded-[25px] bg-cyan-500 text-gray-800 w-[80%] h-[40px] 
                     border-[2px] border-white/60 text-[14px] font-semibold'>
-                    Kick Ball!
+                    Kick Ball
                 </button>
                 <button onClick={resetMatch} className='rounded-[25px] bg-red-500 text-gray-800 w-[80%] h-[40px] 
                     border-[2px] border-white/60 text-[14px] my-2 font-semibold'>
-                    Reset Match!
+                    Reset Match
                 </button>
             </div>
         </section>
