@@ -5,10 +5,13 @@ import ballSound from "../assets/sound/ballkick1.mp3";
 import BGMatchSound from "../assets/sound/InMatchSounds1.mp3";
 import { getNewPos, playAudio, pauseAudio, calcPosition, goalScorePosition, updatePlayerPosition } from '../utils/data';
 import { playerPosData } from '../utils/playerPositionData';
+import { useNavigate } from 'react-router-dom';
+import FieldMapLines from './FieldMapLines';
 
 
 
 function FootballPitchSimulation() {
+    const navigate = useNavigate();
     const footballPitchWidth = 320;
     const footballPitchHeight = 550;
 
@@ -169,29 +172,6 @@ function FootballPitchSimulation() {
         });
     };
 
-    // const updatePlayerPosition = (ref) => {
-    //     if (ref === GK_Ref) {
-    //         setInterval(() => {
-    //             setGKPlayerPosition((pos) => {
-    //                 const newTop = pos.top + (posMotionValueHeight * polarity);
-    //                 const newLeft = pos.left + (posMotionValueWidth * polarity);
-
-    //                 if (newTop < ((footballPitchHeight / 20) - 14) || newTop > ((footballPitchHeight / 20) - 6)) {
-    //                     posMotionValueHeight = posMotionValueHeight * -1;
-    //                     // console.log("NewTop: ", newTop, "NewLeft: ", newLeft, "Random Polarity: ", polarity);
-    //                     return { top: newTop, left: newLeft};
-    //                 }
-    //                 if (newLeft < Math.round((footballPitchWidth / 2) - 16) || newLeft > Math.round((footballPitchWidth / 2) - 10)) {
-    //                     posMotionValueWidth = posMotionValueWidth * -1;
-    //                     // console.log("NewTop: ", newTop, "NewLeft: ", newLeft, "Polarity: ", polarity);
-    //                     return { top: newTop, left: newLeft};
-    //                 }
-    //                 // console.log("NewTop: ", newTop, "NewLeft: ", newLeft, "Normal Polarity: ", polarity);
-    //                 return { top: newTop, left: newLeft};
-    //             });
-    //         }, 500);
-    //     }
-    // }
 
     const kickBall = () => {
         setIsStart(true);
@@ -244,6 +224,10 @@ function FootballPitchSimulation() {
                 className={`relative w-[320px] h-[550px] 
                 bg-[#006400] border-[2px] border-white rounded-[5px] overflow-hidden`}
             >
+                {/* Field Lines */}
+                <div className='absolute'>
+                    <FieldMapLines width={320} height={550} />
+                </div>
                 {/* Center Circle */}
                 <div 
                     className='absolute top-[50%] left-[50%] w-[60px] h-[60px] -mt-[30px] -ml-[30px] 
@@ -395,6 +379,12 @@ function FootballPitchSimulation() {
                 <button onClick={resetMatch} className='rounded-[25px] bg-red-500 text-gray-800 w-[80%] h-[40px] 
                     border-[2px] border-white/60 text-[14px] my-2 font-semibold'>
                     Reset Match
+                </button>
+                <button 
+                    onClick={ () => navigate("/render") } 
+                    className='rounded-[25px] bg-green-800 text-gray-200 w-[80%] h-[40px] 
+                    border-[2px] border-white/60 text-[14px] my-2 font-semibold'>
+                    Render Data
                 </button>
             </div>
         </section>

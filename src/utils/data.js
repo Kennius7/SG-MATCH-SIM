@@ -110,7 +110,36 @@ export const updatePlayerPosition = (
 }
 
 
-
-
-
 export default playerPosInterval;
+
+
+
+export const generateAllCornersWithUniqueIds = (W, H, inc=2) => {
+    // Ensure the dimensions are valid
+    if (W <= 0 || H <= 0) {
+        throw new Error("Width and height must be greater than 0");
+    }
+
+    // Initialize an array to hold the corner coordinates
+    const corners = [];
+    let id = 1; // Unique identifier for each corner
+
+    // Loop through the rectangle, stepping by 2 in both directions
+    for (let y = 0; y < H; y += inc) {
+        for (let x = 0; x < W; x += inc) {
+            // Add all four corners of the current 2x2 box with unique IDs
+            corners.push({ id: id++, corner: "top-left", x, y });
+            corners.push({ id: id++, corner: "top-right", x: x + inc, y });
+            corners.push({ id: id++, corner: "bottom-left", x, y: y + inc });
+            corners.push({ id: id++, corner: "bottom-right", x: x + inc, y: y + inc });
+        }
+    }
+
+    return corners;
+}
+
+
+
+
+
+
