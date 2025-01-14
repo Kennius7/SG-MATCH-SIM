@@ -25,14 +25,20 @@ const Coordinate = () => {
             <div className="w-full h-dvh flex flex-col justify-center items-center">
                 <div className={`w-[300px] h-[200px] text-[22px] font-sans text-slate-900
                     p-2 font-medium
-                    ${Coordinate.id % 4 === 0 
-                    ? "bg-red-200" : Coordinate.id % 4 === 1 
-                    ? "bg-blue-200" : Coordinate.id % 4 === 2 
+                    ${Coordinate.boxId % 4 === 0 
+                    ? "bg-red-200" : Coordinate.boxId % 4 === 1 
+                    ? "bg-blue-200" : Coordinate.boxId % 4 === 2 
                     ? "bg-yellow-200" : "bg-green-200"}`}
                 >
                     <span className="italic">
                         {Coordinate.id}.
                     </span>&nbsp;
+                    <span className="text-blue-900">
+                        Box Number:
+                    </span>&nbsp;
+                    <span className="italic">
+                        {Coordinate.boxId}
+                    </span>,&nbsp;<br/>
                     <span className="text-blue-900">
                         Corner:
                     </span>&nbsp;

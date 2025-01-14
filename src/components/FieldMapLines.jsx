@@ -8,6 +8,17 @@ const FieldMapLines = ({ width=320, height=550 }) => {
     const corners = generateAllCornersWithUniqueIds(320, 550, 10);
     const lines = [];
 
+    // const selectedCorners = () => {
+    //     const selected = [];
+    //     corners.forEach((corner) => {
+    //         if (corner.x > 25 && corner.x < 100 && corner.y > 65 && corner.y < 120 ) {
+    //             selected.push({ x: corner.x, y: corner.y });
+    //         }
+    //     })
+    //     return selected;
+    // }
+    // console.log("Selected Corners: >>>>>>", selectedCorners());
+
     for (let i = 0; i < corners.length; i += 4) {
         const topLeft = corners[i];
         const topRight = corners[i + 1];
@@ -31,8 +42,8 @@ const FieldMapLines = ({ width=320, height=550 }) => {
                         y1={line.start.y} 
                         x2={line.end.x} 
                         y2={line.end.y} 
-                        stroke="black"
-                        strokeWidth={1}
+                        stroke={"black"}
+                        strokeWidth={0.5}
                     />
                 ))
             }
@@ -42,8 +53,14 @@ const FieldMapLines = ({ width=320, height=550 }) => {
                         key={corner.id} 
                         cx={corner.x}
                         cy={corner.y}
-                        r={1}
-                        fill="red"
+                        r={0.5}
+                        fill={
+                            corner.x > 25 && corner.x < 100 && corner.y > 65 && corner.y < 120 
+                            ? "yellow" : corner.x > 85 && corner.x < 170 && corner.y > 65 && corner.y < 120 
+                            ? "red" : corner.x > 155 && corner.x < 230 && corner.y > 65 && corner.y < 120 
+                            ? "blue" : corner.x > 225 && corner.x < 300 && corner.y > 65 && corner.y < 120 
+                            ? "#31f1b1" : "black"
+                        }
                     />
                 ))
             }

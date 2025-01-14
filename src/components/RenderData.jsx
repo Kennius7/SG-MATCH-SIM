@@ -19,7 +19,7 @@ const RenderData = () => {
                         Back
                     </button>
                 </div>
-                <div className="w-full bg-slate-200 grid grid-cols-10 gap-[2px]">
+                <div className="w-full bg-slate-200 grid sm:grid-cols-12 grid-cols-4 gap-[2px]">
                     { 
                         renderData.map(render => 
                             <div 
@@ -27,12 +27,12 @@ const RenderData = () => {
                                 onClick={() => navigate(`/coordinate/${render.id}`)}
                                 className={`p-1 text-[14px] font-sans text-slate-700 flex 
                                 justify-evenly items-center m-1 cursor-pointer
-                                ${render.id % 4 === 0 
-                                ? "bg-red-200" : render.id % 4 === 1 
-                                ? "bg-blue-200" : render.id % 4 === 2 
+                                ${render.boxId % 4 === 0 
+                                ? "bg-red-200" : render.boxId % 4 === 1 
+                                ? "bg-blue-200" : render.boxId % 4 === 2 
                                 ? "bg-yellow-200" : "bg-green-200"}`}
                             >
-                                {render.id}. Corner: {render.corner}, XPos: {render.x}, YPos: {render.y}
+                                {render.id}. Box No. {render.boxId}, Corner: {render.corner}, XPos: {render.x}, YPos: {render.y}
                             </div>
                         ) 
                     }
