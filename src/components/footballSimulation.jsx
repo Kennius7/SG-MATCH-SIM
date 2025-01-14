@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // /* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from 'react';
 import Ball from "../assets/img/soccer-ball.png";

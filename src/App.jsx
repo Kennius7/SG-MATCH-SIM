@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import FootballSimulation from "./components/FootballSimulation";
+import FootballSimulation from "./components/footballSimulation";
 import RenderData from "./components/RenderData";
 import Coordinate from "./components/Coordinate";
 
