@@ -5,7 +5,7 @@ import Ball from "../assets/img/soccer-ball.png";
 import ballSound from "../assets/sound/ballkick1.mp3";
 import BGMatchSound from "../assets/sound/InMatchSounds1.mp3";
 import { 
-    getNewPos, playAudio, pauseAudio, calcPosition, goalScorePosition, updatePlayerPosition
+    playAudio, pauseAudio, calcPosition, goalScorePosition, updatePlayerPosition, handleBallMotion, updateBallPosition,
 } from '../utils/data';
 import { playerPosData } from '../utils/playerPositionData';
 import { useNavigate } from 'react-router-dom';
@@ -32,10 +32,19 @@ function FootballSimulation() {
 
     const goalBottomRef = useRef(null);
     const pitchRef = useRef(null);
+    const centerFieldRef = useRef(null);
     const soundRef = useRef(null);
 
     const [ballPosition, setBallPosition] = useState({ 
         top: (footballPitchHeight / 2) - 10, left: (footballPitchWidth / 2) - 10 
+    });
+
+    const [centerFieldPos, setCenterFieldPos] = useState({ 
+        top: (footballPitchHeight / 2) - 10, left: (footballPitchWidth / 2) - 10 
+    });
+
+    const [bottomGoalPos, setBottomGoalPos] = useState({ 
+        top: (footballPitchHeight / 1) - 22, left: (footballPitchWidth / 3) + 10 
     });
 
     const [GKPlayerPosition, setGKPlayerPosition] = useState({ 
@@ -94,6 +103,8 @@ function FootballSimulation() {
     const [polarity8, setPolarity8] = useState(-1);
     const [isClearInterval, setIsClearInterval] = useState(false);
     const [currentRef, setCurrentRef] = useState("");
+
+    const [ballPassRef, setBallPassRef] = useState(centerFieldRef);
     
     const matchPatternArray1 = [
         { ref: GK_Ref }, { ref: LWB_Ref }, { ref: RWB_Ref }, { ref: LCB_Ref }, { ref: RCB_Ref }, { ref: LCMF_Ref },
@@ -169,15 +180,17 @@ function FootballSimulation() {
     const startMatch = () => {
         setIsBouncing(true);
         if (!isBGPlaying) {
-
             playAudio(audioContext, audioBuffer, playbackPosition, startTimeRef, sourceRef);
 
+            //* GoalKeeper Position Updater Functions
             updatePlayerPosition(
                 setGKPlayerPosition, posMotionValueHeight, posMotionValueWidth, polarity1, 
                 playerPosData.GK_POS.topDiv, playerPosData.GK_POS.topSub, playerPosData.GK_POS.bottomDiv, 
                 playerPosData.GK_POS.bottomSub, playerPosData.GK_POS.leftDiv, playerPosData.GK_POS.leftSub, 
                 playerPosData.GK_POS.rightDiv, playerPosData.GK_POS.rightSub, isClearInterval
             );
+
+            //* Defensive Positions Updater Functions
             updatePlayerPosition(
                 setLWBPlayerPosition, posMotionValueHeight, posMotionValueWidth, polarity2, 
                 playerPosData.LWB_POS.topDiv, playerPosData.LWB_POS.topSub, playerPosData.LWB_POS.bottomDiv, 
@@ -202,6 +215,8 @@ function FootballSimulation() {
                 playerPosData.RCB_POS.bottomSub, playerPosData.RCB_POS.leftDiv, playerPosData.RCB_POS.leftSub, 
                 playerPosData.RCB_POS.rightDiv, playerPosData.RCB_POS.rightSub, isClearInterval
             );
+
+            //* Midfielder Positions Updater Functions
             updatePlayerPosition(
                 setLWFPlayerPosition, posMotionValueHeight, posMotionValueWidth, polarity6, 
                 playerPosData.LWF_POS.topDiv, playerPosData.LWF_POS.topSub, playerPosData.LWF_POS.bottomDiv, 
@@ -249,14 +264,19 @@ function FootballSimulation() {
         pauseAudio(audioContext, sourceRef, startTimeRef, setPlaybackPosition );
     }
 
-    const updateBallPosition = (refA, refB) => {
-        setBallPosition((pos) => {
-            const newTop = pos.top + getNewPos(refA, refB).top;
-            const newLeft = pos.left + getNewPos(refA, refB).left;
-            console.log("Ball Position:>>>>", newLeft, newTop);
-            return { top: newTop, left: newLeft };
-        });
-    };
+    useEffect(() => {
+        const ballCheckInterval = setInterval(() => {
+            setBallPosition({ 
+                ...ballPosition, 
+                top: handleBallMotion(ballPassRef).translateY, 
+                left: handleBallMotion(ballPassRef).translateX 
+            });
+        }, 500);
+
+        return () => clearInterval(ballCheckInterval);
+
+    }, [ballPassRef, ballPosition])
+
 
 
 
@@ -266,92 +286,73 @@ function FootballSimulation() {
         playBallSound();
         if (playCount === 0) {
             calcPosition(LCMF_Ref, setBallPosition);
-            setCurrentRef(LCMF_Ref.current.innerText);
+            setCurrentRef(() => LCMF_Ref.current.innerText);
             setPlayCount(prev => prev + 1);
-            const ballMotionInterval = setInterval(() => {
-                const ballStickMotion = (ref) => {
-                    // let continueRunning = true;
-                    // if (!continueRunning) {
-                    //     console.log("Play count 0 running stopped");
-                    //     return;
-                    // }
-
-                    if (ref.current) {
-                        let translateX = 0;
-                        let translateY = 0;
-                        const style = window.getComputedStyle(ref.current);
-                        const transform = style.transform || style.webkitTransform || style.mozTransform;
-                        if (transform && transform !== "none") {
-                            const matrix = transform.match(/matrix.*\((.+)\)/)[1].split(", ");
-                            translateX = parseFloat(matrix[4]);
-                            translateY = parseFloat(matrix[5]);
-                        }
-                        
-                        console.log("Ref:>>>>", ref.current.innerText, "Position Vals:>>>>>", { translateX, translateY });
-                        setTimeout(() => ballStickMotion(LCMF_Ref), 200);
-                        return { translateX, translateY };
-                    }
-                }
-                // ballStickMotion(LCMF_Ref);
-                setBallPosition({ ...ballPosition, top: ballStickMotion(LCMF_Ref).translateY, left: ballStickMotion(LCMF_Ref).translateX })
-            }, 300);
-
-
+            setBallPassRef(LCMF_Ref);
             console.log("Match Count: ", playCount);
             console.log("Current Ref:>>>>", currentRef);
         }
         if (playCount === 1) {
-            updateBallPosition(matchPatternArray1[5].ref, matchPatternArray1[6].ref);
+            updateBallPosition(matchPatternArray1[5].ref, matchPatternArray1[6].ref, setBallPosition);
             setCurrentRef(matchPatternArray1[6].ref.current.innerText);
             setPlayCount(prev => prev + 1);
+            setBallPassRef(matchPatternArray1[6].ref);
             console.log("Match Count: ", playCount);
             console.log("Current Ref:>>>>", currentRef);
+            setIsClearInterval(true);
         }
         if (playCount === 2) {
-            updateBallPosition(matchPatternArray1[6].ref, matchPatternArray1[7].ref);
+            updateBallPosition(matchPatternArray1[6].ref, matchPatternArray1[7].ref, setBallPosition);
             setCurrentRef(matchPatternArray1[7].ref.current.innerText);
             setPlayCount(prev => prev + 1);
+            setBallPassRef(matchPatternArray1[7].ref);
             console.log("Match Count: ", playCount);
             console.log("Current Ref:>>>>", currentRef);
         }
         if (playCount === 3) {
-            updateBallPosition(matchPatternArray1[7].ref, matchPatternArray1[2].ref);
+            updateBallPosition(matchPatternArray1[7].ref, matchPatternArray1[2].ref, setBallPosition);
             setCurrentRef(matchPatternArray1[2].ref.current.innerText);
             setPlayCount(prev => prev + 1);
+            setBallPassRef(matchPatternArray1[2].ref);
             console.log("Match Count: ", playCount);
             console.log("Current Ref:>>>>", currentRef);
         }
         if (playCount === 4) {
-            updateBallPosition(matchPatternArray1[2].ref, matchPatternArray1[4].ref);
+            updateBallPosition(matchPatternArray1[2].ref, matchPatternArray1[4].ref, setBallPosition);
             setCurrentRef(matchPatternArray1[4].ref.current.innerText);
             setPlayCount(prev => prev + 1);
+            setBallPassRef(matchPatternArray1[4].ref);
             console.log("Match Count: ", playCount);
             console.log("Current Ref:>>>>", currentRef);
         }
         if (playCount === 5) {
-            updateBallPosition(matchPatternArray1[4].ref, matchPatternArray1[8].ref);
+            updateBallPosition(matchPatternArray1[4].ref, matchPatternArray1[8].ref, setBallPosition);
             setCurrentRef(matchPatternArray1[8].ref.current.innerText);
             setPlayCount(prev => prev + 1);
+            setBallPassRef(matchPatternArray1[8].ref);
             console.log("Match Count: ", playCount);
             console.log("Current Ref:>>>>", currentRef);
         }
         if (playCount === 6) {
-            updateBallPosition(matchPatternArray1[8].ref, matchPatternArray1[9].ref);
+            updateBallPosition(matchPatternArray1[8].ref, matchPatternArray1[9].ref, setBallPosition);
             setCurrentRef(matchPatternArray1[9].ref.current.innerText);
             setPlayCount(prev => prev + 1);
+            setBallPassRef(matchPatternArray1[9].ref);
             console.log("Match Count: ", playCount);
             console.log("Current Ref:>>>>", currentRef);
         }
         if (playCount === 7) {
-            updateBallPosition(matchPatternArray1[9].ref, matchPatternArray1[10].ref);
+            updateBallPosition(matchPatternArray1[9].ref, matchPatternArray1[10].ref, setBallPosition);
             setCurrentRef(matchPatternArray1[10].ref.current.innerText);
             setPlayCount(prev => prev + 1);
+            setBallPassRef(matchPatternArray1[10].ref);
             console.log("Match Count: ", playCount);
             console.log("Current Ref:>>>>", currentRef);
         }
         if (playCount === 8) {
             goalScorePosition(goalBottomRef, setBallPosition);
             setPlayCount(prev => prev + 1);
+            setBallPassRef(goalBottomRef);
             console.log("Match Count: ", playCount);
         }
     };
@@ -373,7 +374,18 @@ function FootballSimulation() {
                 {/* Center Circle */}
                 <div 
                     className='absolute top-[50%] left-[50%] w-[60px] h-[60px] -mt-[30px] -ml-[30px] 
-                    border-[2px] border-white rounded-[999px]'>
+                    border-[2px] border-white rounded-[999px] flex justify-center items-center'>
+                    <svg 
+                        width={15} 
+                        height={15} 
+                        ref={centerFieldRef} 
+                        style={{ 
+                            border: "1px solid black", 
+                            backgroundColor: "white",
+                            transform: `translate(${centerFieldPos.left}px, ${centerFieldPos.top}px)`,
+                            visibility: "hidden",
+                        }} 
+                    />
                 </div>
                 {/* Center Line */}
                 <div 
@@ -382,7 +394,11 @@ function FootballSimulation() {
                 {/* Goal Box Top */}
                 <div className={`absolute leftCalc1 top-0 w-[80px] h-[20px] bg-white`}></div>
                 {/* Goal Box Bottom */}
-                <div ref={goalBottomRef} className={`absolute leftCalc1 bottom-0 w-[80px] h-[20px] bg-white`}></div>
+                <div 
+                    ref={goalBottomRef} 
+                    style={{ transform: `translate(${bottomGoalPos.left}px, ${bottomGoalPos.top}px)` }} 
+                    className={`absolute w-[80px] h-[20px] bg-white`}>
+                </div>
                 {/* 18 Yard Box Top */}
                 <div className='absolute leftCalc2 top-0 w-[120px] h-[40px] bg-transparent border-[1px] border-white'></div>
                 {/* 18 Yard Box Bottom */}
@@ -555,5 +571,5 @@ function FootballSimulation() {
 }
 
 
-
 export default FootballSimulation;
+

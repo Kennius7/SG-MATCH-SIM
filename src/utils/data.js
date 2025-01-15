@@ -1,6 +1,5 @@
 
 
-
 export const getPosValues = (ref) => {
     const element = ref.current;
     let translateX = 0;
@@ -86,20 +85,40 @@ export const calcPosition = (ref, setPosition) => {
     }
 }
 
-export const goalScorePosition = (goalPostRef, setPosition) => {
+// export const goalScorePosition = (ref, setState) => {
+//     const goalRandom = Math.random() * 4;
+//     if (ref.current && goalRandom <= 2 ) {
+//         const playerPosLeft = ref.current.offsetLeft + 4;
+//         const playerPosTop = ref.current.offsetTop + 5;
+//         setState({
+//             top: playerPosTop,
+//             left: playerPosLeft,
+//         })
+//     }
+//     if (ref.current && goalRandom > 2 ) {
+//         const playerPosLeft = ref.current.offsetLeft + 64;
+//         const playerPosTop = ref.current.offsetTop + 5;
+//         setState({
+//             top: playerPosTop,
+//             left: playerPosLeft,
+//         })
+//     }
+// }
+
+export const goalScorePosition = (ref, setState) => {
     const goalRandom = Math.random() * 4;
-    if (goalPostRef.current && goalRandom <= 2 ) {
-        const playerPosLeft = goalPostRef.current.offsetLeft + 4;
-        const playerPosTop = goalPostRef.current.offsetTop + 5;
-        setPosition({
+    if (ref.current && goalRandom <= 2 ) {
+        const playerPosLeft = handleBallMotion(ref).translateX;
+        const playerPosTop = handleBallMotion(ref).translateY;
+        setState({
             top: playerPosTop,
             left: playerPosLeft,
         })
     }
-    if (goalPostRef.current && goalRandom > 2 ) {
-        const playerPosLeft = goalPostRef.current.offsetLeft + 64;
-        const playerPosTop = goalPostRef.current.offsetTop + 5;
-        setPosition({
+    if (ref.current && goalRandom > 2 ) {
+        const playerPosLeft = handleBallMotion(ref).translateX;
+        const playerPosTop = handleBallMotion(ref).translateY;
+        setState({
             top: playerPosTop,
             left: playerPosLeft,
         })
@@ -189,7 +208,47 @@ export const generateAllCornersWithUniqueIds = (W, H, inc=2) => {
 }
 
 
+export const handleBallMotion = (ref) => {
+    if (ref.current) {
+        let translateX = 0;
+        let translateY = 0;
+        const style = window.getComputedStyle(ref.current);
+        const transform = style.transform || style.webkitTransform || style.mozTransform;
+        if (transform && transform !== "none") {
+            const matrix = transform.match(/matrix.*\((.+)\)/)[1].split(", ");
+            translateX = parseFloat(matrix[4]);
+            translateY = parseFloat(matrix[5]);
+        }
+        console.log("Ref:>>>>", ref.current.innerText, "Position Vals:>>>>>", { translateX, translateY });
+        // setTimeout(() => handleBallStickMotion(ref), 200);
+        return { translateX, translateY };
+    }
+}
 
+export const ballCheck = (passCheck, ref, setState, state, cycleDuration=1000, functName) => {
+    if (!passCheck) {
+        console.log("Recursion stopped...", passCheck);
+        console.log("Stopped Ref:>>>", functName, ref.current.innerText);
+        return;
+    }
+    setState({ 
+        ...state, 
+        top: handleBallMotion(ref).translateY, 
+        left: handleBallMotion(ref).translateX 
+    });
+    setTimeout(() => { ballCheck(passCheck, ref, setState, state) }, cycleDuration);
+    console.log("Ongoing Ref:>>>", functName, ref.current.innerText);
+    console.log("Recursion ongoing...", passCheck);
+}
+
+export const updateBallPosition = (refA, refB, setState) => {
+    setState((pos) => {
+        const newTop = pos.top + getNewPos(refA, refB).top;
+        const newLeft = pos.left + getNewPos(refA, refB).left;
+        console.log("Ball Position:>>>>", newLeft, newTop);
+        return { top: newTop, left: newLeft };
+    });
+};
 
 
 

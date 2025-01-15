@@ -23,7 +23,7 @@
 }
 
 .ballMotion {
-    transition: transform 0.5s ease;
+    transition: transform 1.5s ease;
 }
 
 .ballMotion2 {
